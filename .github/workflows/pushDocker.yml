@@ -5,6 +5,8 @@ on:
       - main
 jobs:
   job:
+    permissions:
+      packages: write
     strategy:
       fail-fast: false
       matrix:
