@@ -2,7 +2,6 @@ ARG image=ubuntu:rolling
 
 FROM $image
 
-ENV RUSTFLAGS '-C target-cpu=native -C opt-level=3 -C debuginfo=0 -C codegen-units=1'
 ENV userName app
 ENV groupName $userName
 ENV userId 1000
@@ -17,10 +16,6 @@ ADD bin/registerUserBin.bash /bin/registerUserBin
 RUN ["/bin/bash", "-o", "xtrace", "/bin/registerUserBin"]
 ADD bin/installPackages.bash /bin/installPackages
 RUN ["/bin/bash", "-o", "xtrace", "/bin/installPackages"]
-ADD bin/setupRust.bash /bin/setupRust
-RUN ["/bin/bash", "-o", "xtrace", "/bin/setupRust"]
-ADD bin/setupBuilder.bash /bin/setupBuilder
-RUN ["/bin/bash", "-o", "xtrace", "/bin/setupBuilder"]
 ADD bin/afterBuild.bash /bin/afterBuild
 ONBUILD ADD ./build/build*.bash $userHome/bin
 ONBUILD RUN ["/bin/bash", "-c", "if [[ -f $userHome/bin/build.bash ]]; then /bin/bash -o errexit -o pipefail -o xtrace $userHome/bin/build.bash; fi"]
