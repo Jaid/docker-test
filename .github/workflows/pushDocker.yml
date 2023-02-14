@@ -4,23 +4,5 @@ on:
     branches:
       - main
 jobs:
-  job:
-    permissions:
-      packages: write
-      contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - flavorSuffix: -ubuntu-latest
-            image: ubuntu:latest
-            arch: linux/amd64
-    uses: jaid/workflows/.github/workflows/pushDocker.yml@main
-    with:
-      buildArgs: |
-        image=${{ matrix.image }}
-        flavorSuffix=${{ matrix.flavorSuffix }}
-      flavorSuffix: ${{ matrix.flavorSuffix }}
-      arch: ${{ matrix.arch }}
-    secrets:
-      dockerHubToken: ${{ secrets.dockerHubToken }}
+  debug:
+    uses: jaid/workflows/.github/workflows/debug.yml@main
