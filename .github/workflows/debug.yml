@@ -10,6 +10,22 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v3
+      - name: osRelease
+        shell: bash
+        run: |
+          styleBlue=$(TERM=xterm-256color tput setaf 6)
+          styleOrange=$(TERM=xterm-256color tput setaf 172)
+          styleReset=$(TERM=xterm-256color tput sgr0)
+          osRelease=$(cat /etc/os-release)
+          keys=($(printf %s "$osRelease" | cut --fields 1 --delimiter = | sort))
+          for key in "${keys[@]}"; do
+            # declare version=$(dpkg --status "$key" | grep --extended-regexp "^Version:" | cut --fields 2- --delimiter ' ')
+            declare value=$(printf %s "$osRelease" | grep --extended-regexp "^$key=" | cut --fields 2- --delimiter =)
+            if [[ ${value:0:1} == '"' ]]; then
+              value=${value:1:-1}
+            fi
+            printf "$styleOrange%s$styleReset: $styleBlue%s$styleReset\n" "$key" "$value"
+          done
       - name: env
         shell: bash
         run: |
@@ -32,4 +48,4 @@ jobs:
           for key in "${keys[@]}"; do
             declare version=$(dpkg --status "$key" | grep --extended-regexp "^Version:" | cut --fields 2- --delimiter ' ')
             printf "$styleOrange%s$styleReset: $styleBlue%s$styleReset\n" "$key" "$version"
-          done
+          done^
