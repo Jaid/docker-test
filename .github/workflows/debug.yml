@@ -16,5 +16,6 @@ jobs:
           keys=($(printenv | cut -d'=' -f1))
           sortedKeys=($(printf '%s\n' "${keys[@]}" | tr ' ' '\n' | sort -df))
           for key in "${sortedKeys[@]}"; do
-            printf '%s=%s\n' "$key" "${env[$key]}"
+            declare value=$(printenv "$key")
+            printf '%s=%s\n' "$key" "$value"
           done
