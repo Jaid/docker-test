@@ -49,3 +49,7 @@ jobs:
             declare version=$(dpkg --status "$key" | grep --extended-regexp "^Version:" | cut --fields 2- --delimiter ' ')
             printf "$styleOrange%s$styleReset: $styleBlue%s$styleReset\n" "$key" "$version"
           done
+      - name: pythonPackages
+        shell: bash
+        run: |
+          pip list
