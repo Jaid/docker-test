@@ -13,8 +13,7 @@ jobs:
       - name: env
         shell: bash
         run: |
-          env
-          keys=("${!env[@]}")
+          keys=($(printenv | cut -d'=' -f1))
           sortedKeys=($(printf '%s\n' "${keys[@]}" | sort -u))
           for key in "${sortedKeys[@]}"; do
             printf '%s=%s\n' "$key" "${env[$key]}"
