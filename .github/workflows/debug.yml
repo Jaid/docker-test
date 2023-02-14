@@ -13,9 +13,12 @@ jobs:
       - name: env
         shell: bash
         run: |
+          styleBlue=$(tput setaf 6)
+          styleOrange=$(tput setaf 172)
+          styleReset=$(tput sgr0)
           keys=($(printenv | cut -d'=' -f1))
           sortedKeys=($(printf '%s\n' "${keys[@]}" | tr ' ' '\n' | sort -df))
           for key in "${sortedKeys[@]}"; do
             declare value=$(printenv "$key")
-            printf '%s=%s\n' "$key" "$value"
+            printf "$styleOrange%s$styleReset: $styleBlue%s$styleReset\n" "$key" "$value"
           done
