@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch: true
 jobs:
   debug:
     uses: jaid/workflows/.github/workflows/debug.yml@main
