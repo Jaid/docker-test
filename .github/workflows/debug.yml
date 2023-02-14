@@ -22,3 +22,14 @@ jobs:
             declare value=$(printenv "$key")
             printf "$styleOrange%s$styleReset: $styleBlue%s$styleReset\n" "$key" "$value"
           done
+      - name: ubuntuPackages
+        shell: bash
+        run: |
+          styleBlue=$(TERM=xterm-256color tput setaf 6)
+          styleOrange=$(TERM=xterm-256color tput setaf 172)
+          styleReset=$(TERM=xterm-256color tput sgr0)
+          keys=($(dpkg --get-selections | grep --invert-match deinstall | cut --fields 1))
+          for key in "${keys[@]}"; do
+            declare version=$(dpkg --status "$key" | grep --extended-regexp "^Version:" | cut --fields 2- --delimiter ' ')
+            printf "$styleOrange%s$styleReset: $styleBlue%s$styleReset\n" "$key" "$version"
+          done
