@@ -13,6 +13,7 @@ jobs:
       - name: env
         shell: bash
         run: |
+          export TERM=xterm-256color
           styleBlue=$(tput setaf 6)
           styleOrange=$(tput setaf 172)
           styleReset=$(tput sgr0)
