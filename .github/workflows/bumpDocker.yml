@@ -33,3 +33,5 @@ jobs:
       # arch: ${{ matrix.arch }}
     secrets:
       dockerHubToken: ${{ secrets.dockerHubToken }}
+    permissions:
+      contents: write
