@@ -57,3 +57,13 @@ jobs:
         shell: bash
         run: |
           pip list
+      - name: commands
+        shell: bash
+        run: |
+          styleBlue=$(TERM=xterm-256color tput setaf 6)
+          styleOrange=$(TERM=xterm-256color tput setaf 172)
+          styleReset=$(TERM=xterm-256color tput sgr0)
+          IFS=: read -ra paths <<< "$PATH"
+          for folder in "${paths[@]}"; do
+            printf "$styleOrange%s$styleReset\n" "$folder"
+          done
