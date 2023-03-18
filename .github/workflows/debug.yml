@@ -67,8 +67,12 @@ jobs:
           declare -a foundCommands
           for folder in "${paths[@]}"; do
             if [[ -d $folder ]]; then
-              printf "$styleOrange%s$styleReset\n" "$folder"
+              declare -a files
               find "$folder" -maxdepth 1 -type f -executable -printf '%P\0' | sort --zero-terminated | while read -r -d $'\0' file; do
+                files+=("$file")
+              done
+              printf "$styleOrange%s$styleReset (%s)\n" "$folder" "${#files[@]}"
+              for file in "${files[@]}"; do
                 if [[ ! " ${foundCommands[*]} " =~ " ${file} " ]]; then
                   printf "$styleBlue%s$styleReset\n" "$file"
                   foundCommands+=("$file")
