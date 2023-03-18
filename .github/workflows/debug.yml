@@ -64,6 +64,13 @@ jobs:
           styleOrange=$(TERM=xterm-256color tput setaf 172)
           styleReset=$(TERM=xterm-256color tput sgr0)
           IFS=: read -ra paths <<< "$PATH"
+          declare -a foundCommands
           for folder in "${paths[@]}"; do
             printf "$styleOrange%s$styleReset\n" "$folder"
+            find "$folder" -type f -executable -printf '%P\0' | while read -r -d $'\0' file; do
+              if [[ ! " ${foundCommands[*]} " =~ " ${file} " ]]; then
+                printf '$styleBlue%s$styleReset\n' "$file"
+                foundCommands+=("$file")
+              fi
+            done
           done
