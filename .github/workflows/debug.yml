@@ -73,12 +73,14 @@ jobs:
                 files+=("$file")
               done < <(find "$folder" -maxdepth 1 -type f -executable -printf '%P\0')
               sortedFiles=($(printf '%s\n' "${files[@]}" | sort -d))
-              printf "$styleOrange%s$styleReset (%s)\n" "$folder" "${#files[@]}"
-              for file in "${sortedFiles[@]}"; do
-                if [[ ! " ${foundCommands[*]} " =~ " ${file} " ]]; then
-                  printf "$styleBlue%s$styleReset\n" "$file"
-                  foundCommands+=("$file")
-                fi
-              done
+              if [[ ${#files[@]} -ge 1 ]]; then
+                printf "$styleOrange%s$styleReset (%s)\n" "$folder" "${#files[@]}"
+                for file in "${sortedFiles[@]}"; do
+                  if [[ ! " ${foundCommands[*]} " =~ " ${file} " ]]; then
+                    printf "$styleBlue%s$styleReset\n" "$file"
+                    foundCommands+=("$file")
+                  fi
+                done
+              fi
             fi
           done
