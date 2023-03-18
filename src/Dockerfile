@@ -18,7 +18,7 @@ ADD bin/installPackages.bash /bin/installPackages
 RUN ["/bin/bash", "-o", "xtrace", "/bin/installPackages"]
 ADD bin/afterBuild.bash /bin/afterBuild
 ONBUILD ADD ./build/build*.bash $userHome/bin
-ONBUILD RUN ["/bin/bash", "-c", "if [[ -f  $userHome/bin/build.bash ]]; then /bin/bash -o errexit -o pipefail -o xtrace $userHome/bin/build.bash; fi"]
+ONBUILD RUN ["/bin/bash", "-c", "if [[ -f $userHome/bin/build.bash ]]; then /bin/bash -o errexit -o pipefail -o xtrace $userHome/bin/build.bash; fi"]
 ONBUILD RUN ["/bin/bash", "-c", "if [[ -f $userHome/bin/build1.bash ]]; then /bin/bash -o errexit -o pipefail -o xtrace $userHome/bin/build1.bash; fi"]
 ONBUILD RUN ["/bin/bash", "-c", "if [[ -f $userHome/bin/build2.bash ]]; then /bin/bash -o errexit -o pipefail -o xtrace $userHome/bin/build2.bash; fi"]
 ONBUILD RUN ["/bin/bash", "-c", "if [[ -f $userHome/bin/build3.bash ]]; then /bin/bash -o errexit -o pipefail -o xtrace $userHome/bin/build3.bash; fi"]
