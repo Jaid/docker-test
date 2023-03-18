@@ -60,6 +60,7 @@ jobs:
       - name: commands
         shell: bash
         run: |
+          set -o xtrace
           styleBlue=$(TERM=xterm-256color tput setaf 6)
           styleOrange=$(TERM=xterm-256color tput setaf 172)
           styleReset=$(TERM=xterm-256color tput sgr0)
