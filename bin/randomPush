@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -o errexit -o pipefail
+
+currentMillis=$(($(date +%s%N) / 1000000))
+printf %s "$currentMillis" >changefile.txt
+git-flush-cli 'Updated changefile.txt'

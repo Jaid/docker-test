@@ -12,26 +12,27 @@ on:
           - minor
           - major
 jobs:
-  job:
-    # strategy:
-    #   fail-fast: false
-    #   matrix:
-    #     include:
-    #       - flavorSuffix: -debian
-    #         image: debian:stable-slim
-    #         arch: linux/amd64,linux/arm64/v8,linux/ppc64le,linux/s390x
-    #       - flavorSuffix: ''
-    #         image: ubuntu:rolling
-    #         arch: ''
-    #       - flavorSuffix: -ubuntu-latest
-    #         image: ubuntu:latest
+  bump:
     uses: jaid/workflows/.github/workflows/bump.yml@main
     with:
       bumpAmount: ${{ inputs.bumpAmount }}
-      # buildArgs: image=${{ matrix.image }}
-      # flavorSuffix: ${{ matrix.flavorSuffix }}
-      # arch: ${{ matrix.arch }}
-    # secrets:
-    #   dockerHubToken: ${{ secrets.dockerHubToken }}
     permissions:
       contents: write
+  pushDocker:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - flavorSuffix: -debian
+            image: debian:stable-slim
+            arch: linux/amd64,linux/arm64/v8,linux/ppc64le,linux/s390x
+          - flavorSuffix: ''
+            image: ubuntu:rolling
+            arch: ''
+          - flavorSuffix: -ubuntu-latest
+            image: ubuntu:latest
+    uses: jaid/workflows/.github/workflows/pushDocker.yml@main
+    with:
+      buildArgs: image=${{ matrix.image }}
+      flavorSuffix: ${{ matrix.flavorSuffix }}
+      arch: ${{ matrix.arch }}
