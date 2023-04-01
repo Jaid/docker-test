@@ -21,6 +21,7 @@ jobs:
   pushDocker:
     permissions:
       packages: write
+      contents: read
     strategy:
       fail-fast: false
       matrix:
