@@ -13,12 +13,14 @@ on:
           - major
 jobs:
   bump:
+    permissions:
+      contents: write
     uses: jaid/workflows/.github/workflows/bump.yml@main
     with:
       bumpAmount: ${{ inputs.bumpAmount }}
-    permissions:
-      contents: write
   pushDocker:
+    permissions:
+      packages: write
     strategy:
       fail-fast: false
       matrix:
