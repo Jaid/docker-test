@@ -1,8 +1,15 @@
 #!/usr/bin/env bash
 set -o errexit -o pipefail
 
+here="$(cd -- "$(dirname -- "${BASH_SOURCE[0]:-$0}")" &>/dev/null && pwd 2>/dev/null)"
+
 bumpAmount=${1:-patch}
+repoOwner=${repoOwner:-$(git config --get user.name)}
+repoName=${repoName:-$(dirname "$here")}
 
 gh workflow run bumpDocker.yml --field bumpAmount="$bumpAmount" "${@:2}"
 sleep 3
-GH_PAGER='' gh run list --workflow bumpDocker.yml --limit 1
+jsonResponse=$(GH_PAGER='' gh run list --workflow bumpDocker.yml --limit 1 --json conclusion,url)
+conclusion=$(echo "$jsonResponse" | jq -r '.[0].conclusion')
+url=$(echo "$jsonResponse" | jq -r '.[0].url')
+printf '%s %s\n' "$conclusion" "$url"
