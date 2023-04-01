@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -o errexit -o pipefail
+
+bumpAmount=${1:-patch}
+
+gh workflow run bumpDocker.yml --field bumpAmount="$bumpAmount" "${@:2}"
+sleep 3
+GH_PAGER='' gh run list --workflow bumpDocker.yml --limit 1
