@@ -8,7 +8,7 @@ repoOwner=${repoOwner:-$(git config --get user.name)}
 repoName=${repoName:-$(dirname "$here")}
 
 gh workflow run bumpDocker.yml --field bumpAmount="$bumpAmount" "${@:2}"
-sleep 3
+sleep 1
 jsonResponse=$(GH_PAGER='' gh run list --workflow bumpDocker.yml --limit 1 --json conclusion,url)
 conclusion=$(echo "$jsonResponse" | jq -r '.[0].conclusion')
 url=$(echo "$jsonResponse" | jq -r '.[0].url')
