@@ -12,4 +12,8 @@ sleep 1
 jsonResponse=$(GH_PAGER='' gh run list --workflow bumpDocker.yml --limit 1 --json conclusion,url)
 conclusion=$(echo "$jsonResponse" | jq -r '.[0].conclusion')
 url=$(echo "$jsonResponse" | jq -r '.[0].url')
-printf '%s %s\n' "$conclusion" "$url"
+if [[ -n "$conclusion" ]]; then
+  printf '%s %s\n' "$conclusion" "$url"
+else
+  printf '%s\n' "$url"
+fi
