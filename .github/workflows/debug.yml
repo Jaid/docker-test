@@ -7,3 +7,12 @@ on:
 jobs:
   job:
     uses: jaid/workflows/.github/workflows/debug.yml@main
+  testing:
+    runs-on: ubuntu-latest
+    steps:
+      - name: test
+        shell: python
+        run: |
+          print("Hello world")
+          for dist in __import__('pkg_resources').working_set:
+            print(dist.project_name.replace('Python', ''))
