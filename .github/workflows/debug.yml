@@ -10,19 +10,11 @@ jobs:
   testing:
     runs-on: ubuntu-latest
     steps:
-      - name: akk
-        uses: actions/setup-python@v4.5.0
-        with:
-          python-version: '3.11.2'
-          cache: pip
-      - name: installActionsToolkit
+      - name: installActionsToolkitNode
         shell: bash
         run: |
-          pip install actions-toolkit
+          npm install --global @actions/core
       - name: test
-        shell: python
+        shell: node {0}
         run: |
-          print("Hello world")
-          from actions_toolkit import core
-          for dist in __import__('pkg_resources').working_set:
-            print(dist.project_name.replace('Python', ''))
+          console.log('moin')
