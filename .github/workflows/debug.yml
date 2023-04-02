@@ -25,5 +25,5 @@ jobs:
       - name: test
         shell: node {0}
         run: |
+          import "https://cdn.skypack.dev/pin/@actions/core@v1.10.0-UmNQL4zC8UQri7XWPAJq/mode=imports,min/optimized/@actions/core.js"
           console.log('moin')
-          console.dir(require('@actions/core'))
