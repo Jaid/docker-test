@@ -22,6 +22,7 @@ jobs:
     permissions:
       packages: write
       contents: read
+    needs: bump
     strategy:
       fail-fast: false
       matrix:
@@ -42,3 +43,4 @@ jobs:
       buildArgs: image=${{ matrix.image }}
       flavorSuffix: ${{ matrix.flavorSuffix }}
       arch: ${{ matrix.arch }}
+      additionalTags: ${{ needs.bump.outputs.newTag }}
