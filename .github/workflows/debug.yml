@@ -23,7 +23,8 @@ jobs:
           which npm
           npm install --global @actions/core
       - name: test
-        shell: bash -c "node --experimental-network-imports --input-type module < {0}"
+        shell: bash -c "node --input-type module < {0}"
         run: |
-          import "https://cdn.skypack.dev/pin/@actions/core@v1.10.0-UmNQL4zC8UQri7XWPAJq/mode=imports,min/optimized/@actions/core.js"
+          import a from "@actions/core"
+          console.dir(a)
           console.log('moin')
