@@ -10,6 +10,11 @@ jobs:
   testing:
     runs-on: ubuntu-latest
     steps:
+      - name: setupNode
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: current
+          cache: npm
       - name: installActionsToolkitNode
         shell: bash
         run: |
@@ -18,3 +23,4 @@ jobs:
         shell: node {0}
         run: |
           console.log('moin')
+          console.dir(require('@actions/core'))
