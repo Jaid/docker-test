@@ -17,6 +17,10 @@ jobs:
       - name: installActionsToolkitNode
         shell: bash
         run: |
+          node --version
+          npm --version
+          which node
+          which npm
           npm install --global @actions/core
       - name: test
         shell: node {0}
