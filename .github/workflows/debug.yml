@@ -14,5 +14,6 @@ jobs:
         shell: python
         run: |
           print("Hello world")
+          from actions_toolkit import core
           for dist in __import__('pkg_resources').working_set:
             print(dist.project_name.replace('Python', ''))
