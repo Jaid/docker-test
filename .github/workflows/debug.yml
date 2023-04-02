@@ -10,6 +10,15 @@ jobs:
   testing:
     runs-on: ubuntu-latest
     steps:
+      - name: akk
+        uses: actions/setup-python@v4.5.0
+        with:
+          python-version: '3.11.2'
+          cache: pip
+      - name: installActionsToolkit
+        shell: bash
+        run: |
+          pip install actions-toolkit
       - name: test
         shell: python
         run: |
