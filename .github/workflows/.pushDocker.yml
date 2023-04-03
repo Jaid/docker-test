@@ -88,6 +88,8 @@ on:
         value: ${{ jobs.job.outputs.meta }}
       digest:
         value: ${{ jobs.job.outputs.digest }}
+      imageId:
+        value: ${{ jobs.job.outputs.imageId }}
       imageName:
         value: ${{ jobs.job.outputs.imageName }}
       imageSlug:

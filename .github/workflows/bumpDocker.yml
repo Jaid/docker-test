@@ -21,6 +21,7 @@ jobs:
     with:
       bumpAmount: ${{ inputs.bumpAmount }}
   pushDocker:
+    name: Docker image ${{ matrix.flavorSuffix }}
     permissions:
       packages: write
       contents: read
