@@ -195,42 +195,6 @@ jobs:
         shell: bash -c "node --input-type module < {0}"
         run: |
           import core from '@actions/core'
-          console.dir({
-            baseTags: core.getMultilineInput('baseTags'),
-          })
-          console.dir({
-            additionalTags: core.getMultilineInput('additionalTags'),
-          })
-          console.dir({
-            versionTag: core.getInput('versionTag'),
-          })
-          console.dir({
-            addVersionTag: core.getInput('addVersionTag'),
-          })
-          console.dir({
-            addVersionTag: core.getBooleanInput('addVersionTag'),
-          })
-          console.dir({
-            versionTagPrefix: core.getInput('versionTagPrefix'),
-          })
-          console.dir({
-            addShaTags: core.getBooleanInput('addShaTags'),
-          })
-          console.dir({
-            addScheduleTags: core.getBooleanInput('addScheduleTags'),
-          })
-          console.dir({
-            addLatestTag: core.getBooleanInput('addLatestTag'),
-          })
-          console.dir({
-            flavorLatest: core.getInput('flavorLatest'),
-          })
-          console.dir({
-            flavorPrefix: core.getInput('flavorPrefix'),
-          })
-          console.dir({
-            flavorSuffix: core.getInput('flavorSuffix'),
-          })
           const tags = []
           // TODO I have no idea why this is necessary, but sometimes boolean inputs are not recognized as such and will be returned as empty strings
           const getBooleanInput = key => {
@@ -249,13 +213,13 @@ jobs:
           if (core.getInput('versionTag')) {
             tags.push(`type=raw,value=${core.getInput('versionTag')}}`)
           }
-          if (core.getBooleanInput('addVersionTag')) {
+          if (getBooleanInput('addVersionTag')) {
             tags.push(`type=pep440,pattern=${core.getInput('versionTagPrefix') ?? ''}{{version}}`)
           }
-          if (core.getBooleanInput('addShaTags')) {
+          if (getBooleanInput('addShaTags')) {
             tags.push('type=sha,format=long')
           }
-          if (core.getBooleanInput('addScheduleTags')) {
+          if (getBooleanInput('addScheduleTags')) {
             tags.push('type=schedule,pattern=nightly')
             tags.push('type=schedule,pattern={{date \'YYYYMMDD\'}}')
           }
