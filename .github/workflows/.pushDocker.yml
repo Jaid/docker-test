@@ -286,7 +286,7 @@ jobs:
           cache-to: ${{ steps.getCacheInstruction.outputs.cache-to }}
           push: true
       - name: dockerPushReadme
-        if: ${{ steps.getDockerHubTokenLength.outputs.length > 0 && inputs.additionalTags }}
+        if: ${{ steps.getDockerHubTokenLength.outputs.length > 0 && inputs.readmePath }}
         uses: peter-evans/dockerhub-description@v3.3.0
         with:
           username: ${{ steps.getDockerHubUser.outputs.user }}
