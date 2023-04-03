@@ -101,7 +101,7 @@ on:
 jobs:
   debug:
     uses: jaid/workflows/.github/workflows/debug.yml@main
-    if: ${{ github. }}
+    if: ${{ runner.debug == '1' }}
   job:
     name: ${{ github.event_name }}${{ inputs.flavorSuffix && ' ' || '' }}${{ inputs.flavorSuffix }}
     runs-on: ubuntu-latest
@@ -232,6 +232,14 @@ jobs:
             flavorSuffix: core.getInput('flavorSuffix'),
           })
           const tags = []
+          // TODO I have no idea why this is necessary, but sometimes boolean inputs are not recognized as such and will be returned as empty strings
+          const getBooleanInput = key => {
+            const value = core.getInput(key)
+            if (!value.length) {
+              return false
+            }
+            return core.getBooleanInput(key)
+          }
           if (core.getMultilineInput('baseTags')) {
             tags.push(...core.getInput('baseTags').split('\n'))
           }
