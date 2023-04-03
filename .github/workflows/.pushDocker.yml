@@ -196,6 +196,9 @@ jobs:
             versionTag: core.getInput('versionTag'),
           })
           console.dir({
+            addVersionTag: core.getInput('addVersionTag'),
+          })
+          console.dir({
             addVersionTag: core.getBooleanInput('addVersionTag'),
           })
           console.dir({
