@@ -12,6 +12,8 @@ on:
           - minor
           - major
 jobs:
+  debug:
+    uses: jaid/workflows/.github/workflows/debug.yml@main
   bump:
     permissions:
       contents: write
