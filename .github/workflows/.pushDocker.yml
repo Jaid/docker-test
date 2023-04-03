@@ -14,7 +14,8 @@ on:
       dockerHubUser:
         type: string
         required: false
-        default: jaidchen
+        default: ''
+        description: If left empty, the Docker Hub user will be the same as the GitHub user
       dockerHubRegistry:
         type: string
         required: false
@@ -71,6 +72,10 @@ on:
         type: string
         required: false
         default: '-'
+      readmePath:
+        type: string
+        required: false
+        default: readme.md
       # flavorPrefixLatest:
       #   type: string
       #   required: false
@@ -132,7 +137,7 @@ jobs:
         id: dockerHubRef
         shell: bash
         env:
-          dockerHubUser: ${{ inputs.dockerHubUser }}
+          dockerHubUser: ${{ inputs.dockerHubUser || github.repository_owner }}
           repoName: ${{ github.event.repository.name }}
         run: |
           shortName=${repoName##docker-}
@@ -189,7 +194,7 @@ jobs:
           printf arch=%s "$arch" > $GITHUB_OUTPUT
       - name: getTags
         id: getTags
-        shell: bash -c "node --input-type module < {0}"
+        shell: sh -c "node --input-type module < {0}"
         run: |
           import core from '@actions/core'
           const tags = []
@@ -225,6 +230,15 @@ jobs:
             process.exit(1)
           }
           core.setOutput('tags', tags.map(tag => tag.trim()).join('\n'))
+      - name: getDockerHubUser
+        id: getDockerHubUser
+        shell: sh -c "node --input-type module < {0}"
+        env:
+          fallback: ${{github.repository_owner }}
+        run: |
+          import core from '@actions/core'
+          const dockerHubUser = core.getInput('dockerHubUser') || process.env.fallback
+          core.setOutput('user', dockerHubUser)
       - name: Checkout
         uses: actions/checkout@v3.5.0
       - name: Set up qemu
@@ -235,7 +249,7 @@ jobs:
         if: ${{ steps.getDockerHubTokenLength.outputs.length > 0 }}
         uses: docker/login-action@v2.1.0
         with:
-          username: ${{ inputs.dockerHubUser }}
+          username: ${{ steps.getDockerHubUser.outputs.user }}
           password: ${{ secrets.dockerHubToken }}
       - name: Login to ${{ inputs.githubRegistry }}
         uses: docker/login-action@v2.1.0
@@ -271,9 +285,10 @@ jobs:
           cache-from: ${{ steps.getCacheInstruction.outputs.cache-from }}
           cache-to: ${{ steps.getCacheInstruction.outputs.cache-to }}
           push: true
-      - name: debug
-        id: debug
-        shell: bash
-        run: |
-          set -o xtrace
-          docker image list --all
+      - name: dockerPushReadme
+        if: ${{ steps.getDockerHubTokenLength.outputs.length > 0 && inputs.additionalTags }}
+        uses: peter-evans/dockerhub-description@v3.3.0
+        with:
+          username: ${{ steps.getDockerHubUser.outputs.user }}
+          password: ${{ secrets.dockerHubToken }}
+          readme-filepath: ${{ inputs.readmePath }}

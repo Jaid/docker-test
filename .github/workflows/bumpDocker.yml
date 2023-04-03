@@ -43,6 +43,7 @@ jobs:
           #   image: ubuntu:latest
     uses: jaid/docker-test/.github/workflows/.pushDocker.yml@main
     with:
+      dockerHubUser: jaidchen
       buildArgs: image=${{ matrix.image }}
       flavorSuffix: ${{ matrix.flavorSuffix }}
       arch: ${{ matrix.arch }}
