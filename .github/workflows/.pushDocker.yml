@@ -83,9 +83,9 @@ jobs:
       packages: write
       contents: read
     outputs:
-      meta: ${{ steps.dockerBuild.outputs.metadata }}
-      digest: ${{ steps.dockerBuild.outputs.digest }}
-      imageId: ${{ steps.dockerBuild.outputs.imageid }}
+      meta: ${{ steps.dockerPush.outputs.metadata }}
+      digest: ${{ steps.dockerPush.outputs.digest }}
+      imageId: ${{ steps.dockerPush.outputs.imageid }}
       imageSlug: ${{ steps.dockerHubRef.outputs.ref }}
       imageName: ${{ steps.dockerHubRef.outputs.shortName }}
     steps:
@@ -222,8 +222,8 @@ jobs:
             suffix=${{ inputs.flavorSuffix }}
           # prefixLatest=${{ inputs.flavorPrefixLatest }}
           # suffixLatest=${{ inputs.flavorSuffixLatest }}
-      - name: dockerBuild
-        id: dockerBuild
+      - name: dockerPush
+        id: dockerPush
         uses: docker/build-push-action@v4.0.0
         with:
           context: ${{ inputs.buildContext }}
@@ -233,16 +233,4 @@ jobs:
           build-args: ${{ inputs.buildArgs }}
           cache-from: ${{ steps.getCacheInstruction.outputs.cache-from }}
           cache-to: ${{ steps.getCacheInstruction.outputs.cache-to }}
-          outputs: type=docker,dest=image.tar
-      - name: dockerPush
-        id: dockerPush
-        uses: docker/build-push-action@v4.0.0
-        with:
           push: true
-          # context: ${{ inputs.buildContext }}
-          platforms: ${{ steps.getArch.outputs.arch }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=docker,dest=image.tar
-          # build-args: ${{ inputs.buildArgs }}
-          load: image.tar
