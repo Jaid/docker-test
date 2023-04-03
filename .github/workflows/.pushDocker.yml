@@ -185,6 +185,21 @@ jobs:
         shell: bash -c "node --input-type module < {0}"
         run: |
           import core from '@actions/core'
+          console.dir({
+            baseTags: core.getMultilineInput('baseTags'),
+            additionalTags: core.getMultilineInput('additionalTags'),
+            versionTag: core.getInput('versionTag'),
+            addVersionTag: core.getBooleanInput('addVersionTag'),
+            versionTagPrefix: core.getInput('versionTagPrefix'),
+            addShaTags: core.getBooleanInput('addShaTags'),
+            addScheduleTags: core.getBooleanInput('addScheduleTags'),
+            addLatestTag: core.getBooleanInput('addLatestTag'),
+            flavorLatest: core.getInput('flavorLatest'),
+            flavorPrefix: core.getInput('flavorPrefix'),
+            flavorSuffix: core.getInput('flavorSuffix'),
+            // flavorPrefixLatest: core.getInput('flavorPrefixLatest'),
+            // flavorSuffixLatest: core.getInput('flavorSuffixLatest'),
+          })
           const tags = []
           if (core.getMultilineInput('baseTags')) {
             tags.push(...core.getInput('baseTags').split('\n'))
@@ -195,7 +210,6 @@ jobs:
           if (core.getInput('versionTag')) {
             tags.push(`type=raw,value=${core.getInput('versionTag')}}`)
           }
-          console.dir(core.getInput('addVersionTag'))
           if (core.getBooleanInput('addVersionTag')) {
             tags.push(`type=pep440,pattern=${core.getInput('versionTagPrefix') ?? ''}{{version}}`)
           }
