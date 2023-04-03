@@ -188,18 +188,36 @@ jobs:
           import core from '@actions/core'
           console.dir({
             baseTags: core.getMultilineInput('baseTags'),
+          })
+          console.dir({
             additionalTags: core.getMultilineInput('additionalTags'),
+          })
+          console.dir({
             versionTag: core.getInput('versionTag'),
+          })
+          console.dir({
             addVersionTag: core.getBooleanInput('addVersionTag'),
+          })
+          console.dir({
             versionTagPrefix: core.getInput('versionTagPrefix'),
+          })
+          console.dir({
             addShaTags: core.getBooleanInput('addShaTags'),
+          })
+          console.dir({
             addScheduleTags: core.getBooleanInput('addScheduleTags'),
+          })
+          console.dir({
             addLatestTag: core.getBooleanInput('addLatestTag'),
+          })
+          console.dir({
             flavorLatest: core.getInput('flavorLatest'),
+          })
+          console.dir({
             flavorPrefix: core.getInput('flavorPrefix'),
+          })
+          console.dir({
             flavorSuffix: core.getInput('flavorSuffix'),
-            // flavorPrefixLatest: core.getInput('flavorPrefixLatest'),
-            // flavorSuffixLatest: core.getInput('flavorSuffixLatest'),
           })
           const tags = []
           if (core.getMultilineInput('baseTags')) {
