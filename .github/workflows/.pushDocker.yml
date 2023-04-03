@@ -94,6 +94,7 @@ on:
         value: ${{ jobs.job.outputs.imageSlug }}
 jobs:
   job:
+    name: ${{ github.event_name }}${{ inputs.flavorSuffix && ' ' || '' }}${{ inputs.flavorSuffix }}
     runs-on: ubuntu-latest
     permissions:
       packages: write
