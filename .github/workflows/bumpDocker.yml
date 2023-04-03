@@ -33,10 +33,10 @@ jobs:
           # - flavorSuffix: -debian
           #   image: debian:stable-slim
           #   arch: linux/amd64,linux/arm64/v8,linux/ppc64le,linux/s390x
-          # - flavorSuffix: ''
-          #   image: ubuntu:rolling
-          #   arch: ''
-          - flavorSuffix: -fast-build
+          - flavorSuffix: ''
+            image: ubuntu:rolling
+            arch: linux/arm64/v8
+          - flavorSuffix: fast-build
             image: ubuntu:latest
             arch: linux/arm64/v8
           # - flavorSuffix: -ubuntu-latest
