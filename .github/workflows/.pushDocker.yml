@@ -133,11 +133,20 @@ jobs:
         run: |
           length=${#dockerHubToken}
           printf 'length=%s' "$length" > $GITHUB_OUTPUT
+      - name: getDockerHubUser
+        id: getDockerHubUser
+        shell: sh -c "node --input-type module < {0}"
+        env:
+          fallback: ${{github.repository_owner }}
+        run: |
+          import core from '@actions/core'
+          const dockerHubUser = core.getInput('dockerHubUser') || process.env.fallback
+          core.setOutput('user', dockerHubUser)
       - name: dockerHubRef
         id: dockerHubRef
         shell: bash
         env:
-          dockerHubUser: ${{ inputs.dockerHubUser || github.repository_owner }}
+          dockerHubUser: ${{ steps.getDockerHubUser.outputs.user }}
           repoName: ${{ github.event.repository.name }}
         run: |
           shortName=${repoName##docker-}
@@ -230,15 +239,6 @@ jobs:
             process.exit(1)
           }
           core.setOutput('tags', tags.map(tag => tag.trim()).join('\n'))
-      - name: getDockerHubUser
-        id: getDockerHubUser
-        shell: sh -c "node --input-type module < {0}"
-        env:
-          fallback: ${{github.repository_owner }}
-        run: |
-          import core from '@actions/core'
-          const dockerHubUser = core.getInput('dockerHubUser') || process.env.fallback
-          core.setOutput('user', dockerHubUser)
       - name: Checkout
         uses: actions/checkout@v3.5.0
       - name: Set up qemu
@@ -292,3 +292,4 @@ jobs:
           username: ${{ steps.getDockerHubUser.outputs.user }}
           password: ${{ secrets.dockerHubToken }}
           readme-filepath: ${{ inputs.readmePath }}
+          repository: ${{ steps.dockerHubRef.outputs.ref }}
