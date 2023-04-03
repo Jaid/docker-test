@@ -239,5 +239,4 @@ jobs:
         shell: bash
         run: |
           set -o xtrace
-          docker image list --format '{{.Repository}}:{{.Tag}}'
-          docker image inspect ${{ steps.meta.outputs.tags }}
+          docker image list --all
