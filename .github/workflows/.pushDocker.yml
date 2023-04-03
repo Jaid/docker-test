@@ -35,12 +35,12 @@ on:
       addScheduleTags:
         type: boolean
         required: false
-        default: true
+        default: false
         description: If true, create Docker image tags named after the current date (good for persistence and debugging, but might produce a lot of clutter) (only on schedule events)
       addVersionTag:
         type: boolean
         required: false
-        default: true
+        default: false
         description: If true, create a Docker image tag named after the new current version (only on push tag events)
       versionTagPrefix:
         type: string
@@ -183,14 +183,6 @@ jobs:
       - name: getTags
         id: getTags
         shell: bash -c "node --input-type module < {0}"
-        env:
-          baseTags: ${{ inputs.baseTags }}
-          versionTag: ${{ inputs.versionTag }}
-          additionalTags: ${{ inputs.additionalTags }}
-          addShaTags: ${{ inputs.addShaTags }}
-          addScheduleTags: ${{ inputs.addScheduleTags }}
-          addVersionTag: ${{ inputs.addVersionTag }}
-          versionTagPrefix: ${{ inputs.versionTagPrefix }}
         run: |
           import core from '@actions/core'
           const tags = []
@@ -203,6 +195,7 @@ jobs:
           if (core.getInput('versionTag')) {
             tags.push(`type=raw,value=${core.getInput('versionTag')}}`)
           }
+          core.warning(core.getInput('addVersionTag'))
           if (core.getBooleanInput('addVersionTag')) {
             tags.push(`type=pep440,pattern=${core.getInput('versionTagPrefix') ?? ''}{{version}}`)
           }
