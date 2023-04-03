@@ -195,7 +195,7 @@ jobs:
           if (core.getInput('versionTag')) {
             tags.push(`type=raw,value=${core.getInput('versionTag')}}`)
           }
-          core.warning(core.getInput('addVersionTag'))
+          console.dir(core.getInput('addVersionTag'))
           if (core.getBooleanInput('addVersionTag')) {
             tags.push(`type=pep440,pattern=${core.getInput('versionTagPrefix') ?? ''}{{version}}`)
           }
