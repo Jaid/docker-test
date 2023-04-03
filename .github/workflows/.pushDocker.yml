@@ -26,19 +26,35 @@ on:
       baseTags:
         type: string
         required: false
-        default: |
-          type=ref,event=branch
-          type=schedule,pattern=nightly
-          type=schedule,pattern={{date 'YYYYMMDD'}}
-      shaTags:
+        default: type=ref,event=branch
+      addShaTags:
         type: boolean
         required: false
         default: false
-        description: If true, create a docker image tag named after the commit’s SHA hash (good for persistence and debugging, but will produce a lot of clutter)
+        description: If true, create a Docker image tag named after the commit’s SHA hash (good for persistence and debugging, but might produce a lot of clutter)
+      addScheduleTags:
+        type: boolean
+        required: false
+        default: true
+        description: If true, create Docker image tags named after the current date (good for persistence and debugging, but might produce a lot of clutter) (only on schedule events)
+      addVersionTag:
+        type: boolean
+        required: false
+        default: true
+        description: If true, create a Docker image tag named after the new current version (only on push tag events)
+      versionTagPrefix:
+        type: string
+        required: false
+        default: v
+        description: Will be appended to the automatically generated version tag (only if addVersionTag is true and event is push tag)
       additionalTags:
         type: string
         required: false
-        default: ''
+        default: null
+      versionTag:
+        type: string
+        required: false
+        default: null
       flavorLatest:
         type: string
         required: false
@@ -169,8 +185,12 @@ jobs:
         shell: bash -c "node --input-type module < {0}"
         env:
           baseTags: ${{ inputs.baseTags }}
+          versionTag: ${{ inputs.versionTag }}
           additionalTags: ${{ inputs.additionalTags }}
-          shaTags: ${{ inputs.shaTags }}
+          addShaTags: ${{ inputs.addShaTags }}
+          addScheduleTags: ${{ inputs.addScheduleTags }}
+          addVersionTag: ${{ inputs.addVersionTag }}
+          versionTagPrefix: ${{ inputs.versionTagPrefix }}
         run: |
           import core from '@actions/core'
           const tags = []
@@ -180,14 +200,24 @@ jobs:
           if (process.env.additionalTags) {
             tags.push(...process.env.additionalTags.split('\n'))
           }
-          if (process.env.shaTags) {
+          if (process.env.versionTag) {
+            tags.push(`type=raw,value=${process.env.versionTag}}`)
+          }
+          if (process.env.addVersionTag) {
+            tags.push(`type=pep440,pattern=${process.env.versionTagPrefix ?? ''}{{version}}`)
+          }
+          if (process.env.addShaTags) {
             tags.push('type=sha,format=long')
+          }
+          if (process.env.addScheduleTags) {
+            tags.push('type=schedule,pattern=nightly')
+            tags.push('type=schedule,pattern={{date \'YYYYMMDD\'}}')
           }
           if (!tags.length) {
             core.error('No tags given')
             process.exit(1)
           }
-          core.setOutput('tags', tags.join('\n'))
+          core.setOutput('tags', tags.map(tag => tag.trim()).join('\n'))
       - name: Checkout
         uses: actions/checkout@v3.5.0
       - name: Set up qemu
