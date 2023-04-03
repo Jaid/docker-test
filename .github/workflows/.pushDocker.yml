@@ -99,9 +99,6 @@ on:
       imageSlug:
         value: ${{ jobs.job.outputs.imageSlug }}
 jobs:
-  debug:
-    uses: jaid/workflows/.github/workflows/debug.yml@main
-    if: ${{ runner.debug == '1' }}
   job:
     name: ${{ github.event_name }}${{ inputs.flavorSuffix && ' ' || '' }}${{ inputs.flavorSuffix }}
     runs-on: ubuntu-latest
