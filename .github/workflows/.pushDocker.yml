@@ -194,22 +194,22 @@ jobs:
         run: |
           import core from '@actions/core'
           const tags = []
-          if (process.env.baseTags) {
-            tags.push(...process.env.baseTags.split('\n'))
+          if (core.getMultilineInput('baseTags')) {
+            tags.push(...core.getInput('baseTags').split('\n'))
           }
-          if (process.env.additionalTags) {
-            tags.push(...process.env.additionalTags.split('\n'))
+          if (core.getMultilineInput('additionalTags')) {
+            tags.push(...core.getInput('additionalTags').split('\n'))
           }
-          if (process.env.versionTag) {
-            tags.push(`type=raw,value=${process.env.versionTag}}`)
+          if (core.getInput('versionTag')) {
+            tags.push(`type=raw,value=${core.getInput('versionTag')}}`)
           }
-          if (process.env.addVersionTag) {
-            tags.push(`type=pep440,pattern=${process.env.versionTagPrefix ?? ''}{{version}}`)
+          if (core.getBooleanInput('addVersionTag')) {
+            tags.push(`type=pep440,pattern=${core.getInput('versionTagPrefix') ?? ''}{{version}}`)
           }
-          if (process.env.addShaTags) {
+          if (core.getBooleanInput('addShaTags')) {
             tags.push('type=sha,format=long')
           }
-          if (process.env.addScheduleTags) {
+          if (core.getBooleanInput('addScheduleTags')) {
             tags.push('type=schedule,pattern=nightly')
             tags.push('type=schedule,pattern={{date \'YYYYMMDD\'}}')
           }
