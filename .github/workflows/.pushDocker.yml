@@ -15,7 +15,7 @@ on:
         type: string
         required: false
         default: ''
-        description: If left empty, the Docker Hub user will be the same as the GitHub user
+        description: If unset, the Docker Hub user will be the same as the GitHub user
       dockerHubRegistry:
         type: string
         required: false
