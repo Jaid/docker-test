@@ -19,9 +19,6 @@ on:
 jobs:
   job:
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: read
     outputs: {}
       # meta: ${{ steps.dockerBuild.outputs.metadata }}
       # digest: ${{ steps.dockerBuild.outputs.digest }}
