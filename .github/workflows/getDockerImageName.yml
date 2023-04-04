@@ -51,4 +51,4 @@ jobs:
           import { context } from '@actions/github'
           import core from '@actions/core'
           import preventStart from 'prevent-start'
-          console.dir(preventStart.default(context.payload.repository.name.toLowerCase()), 'docker-')
+          console.dir(preventStart.default(context.payload.repository.name.toLowerCase(), 'docker-'))
