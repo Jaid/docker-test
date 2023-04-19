@@ -27,5 +27,7 @@ COPY --from=build /build/tini/tini-static /bin/tini
 COPY --from=build /usr/bin/hyperfine /bin/hyperfine
 COPY --from=build /usr/bin/smileypyramid /bin/smileypyramid
 ADD *.bash /bin
+RUN whoami
+RUN ls -lah /usr/bin
 RUN /bin/init.bash
 ENTRYPOINT ["/bin/bash", "-o", "errexit", "-o", "pipefail", "-o", "xtrace", "/bin/entrypoint.bash"]
