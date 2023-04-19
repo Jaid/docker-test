@@ -36,9 +36,9 @@ jobs:
           - flavorSuffix: ''
             image: ubuntu:rolling
             arch: linux/arm64/v8
-          - flavorSuffix: fast-build
-            image: ubuntu:latest
-            arch: linux/arm64/v8
+          # - flavorSuffix: fast-build
+          #   image: ubuntu:latest
+          #   arch: linux/arm64/v8
           # - flavorSuffix: -ubuntu-latest
           #   image: ubuntu:latest
     uses: jaid/docker-test/.github/workflows/.pushDocker.yml@main
