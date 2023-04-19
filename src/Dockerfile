@@ -12,6 +12,7 @@ WORKDIR /build
 ADD userBin/* $userHome/userBin/
 ADD bin/build.bash /bin/build
 RUN ls -lah /bin
+RUN ls -lah /usr/bin
 RUN /bin/build
 
 FROM $image
