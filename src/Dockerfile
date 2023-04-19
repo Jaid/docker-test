@@ -10,9 +10,7 @@ ENV userHome /$userName
 
 WORKDIR /build
 ADD userBin/* $userHome/userBin/
-ADD bin/build.bash /bin/build.bash
-RUN ls -lah /bin
-RUN ls -lah /usr/bin
+ADD bin/build.bash /bin
 RUN bash /bin/build.bash
 
 FROM $image
