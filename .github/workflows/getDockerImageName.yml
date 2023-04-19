@@ -7,24 +7,23 @@ on:
         required: false
         default: ''
         description: If unset, the Docker Hub user will be the same as the GitHub user
-    outputs: {}
-      # meta:
-      #   value: ${{ jobs.job.outputs.meta }}
-      # digest:
-      #   value: ${{ jobs.job.outputs.digest }}
-      # imageName:
-      #   value: ${{ jobs.job.outputs.imageName }}
-      # imageSlug:
-      #   value: ${{ jobs.job.outputs.imageSlug }}
+    outputs:
+      imageUser:
+        description: The Docker Hub user
+        value: ${{ jobs.job.outputs.imageUser }}
+      imageName:
+        description: The Docker image name
+        value: ${{ jobs.job.outputs.imageName }}
+      imageSlug:
+        description: The Docker image slug
+        value: ${{ jobs.job.outputs.imageSlug }}
 jobs:
   job:
     runs-on: ubuntu-latest
-    outputs: {}
-      # meta: ${{ steps.dockerBuild.outputs.metadata }}
-      # digest: ${{ steps.dockerBuild.outputs.digest }}
-      # imageId: ${{ steps.dockerBuild.outputs.imageid }}
-      # imageSlug: ${{ steps.dockerHubRef.outputs.ref }}
-      # imageName: ${{ steps.dockerHubRef.outputs.shortName }}
+    outputs:
+      imageUser: ${{ steps.getDockerHubUser.outputs.output }}
+      imageName: ${{ steps.getDockerImageName.outputs.output }}
+      imageSlug: ${{ steps.getDockerHubUser.outputs.output }}/${{ steps.getDockerImageName.outputs.output }}
     steps:
       - name: setupNode
         uses: actions/setup-node@v3.6.0
