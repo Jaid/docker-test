@@ -9,8 +9,9 @@ ENV groupId $userId
 ENV userHome /$userName
 
 WORKDIR /build
-ADD bin/build.bash /bin/build
 ADD userBin/* $userHome/userBin/
+ADD bin/build.bash /bin/build
+RUN ls -lah /bin
 RUN /bin/build
 
 FROM $image
