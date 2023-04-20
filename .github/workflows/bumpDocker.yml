@@ -36,12 +36,12 @@ jobs:
           - flavorSuffix: ''
             image: ubuntu:rolling
             arch: linux/arm64/v8
-          # - flavorSuffix: fast-build
-          #   image: ubuntu:latest
-          #   arch: linux/arm64/v8
+          - flavorSuffix: ubuntu-latest
+            image: ubuntu:latest
+            arch: linux/arm64/v8
           # - flavorSuffix: -ubuntu-latest
           #   image: ubuntu:latest
-    uses: jaid/docker-test/.github/workflows/.pushDocker.yml@main
+    uses: jaid/workflows/.github/workflows/pushDocker.yml@main
     with:
       dockerHubUser: jaidchen
       buildArgs: image=${{ matrix.image }}
