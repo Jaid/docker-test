@@ -30,17 +30,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # - flavorSuffix: -debian
-          #   image: debian:stable-slim
-          #   arch: linux/amd64,linux/arm64/v8,linux/ppc64le,linux/s390x
-          - flavorSuffix: ''
-            image: ubuntu:rolling
-            arch: linux/arm64/v8
+          - flavorSuffix: debian
+            image: debian:stable-slim
+            arch: linux/amd64
+          - image: ubuntu:rolling
           - flavorSuffix: ubuntu-latest
             image: ubuntu:latest
-            arch: linux/arm64/v8
-          # - flavorSuffix: -ubuntu-latest
-          #   image: ubuntu:latest
+            arch: linux/amd64
     uses: jaid/workflows/.github/workflows/pushDocker.yml@main
     with:
       dockerHubUser: jaidchen
