@@ -38,7 +38,7 @@ jobs:
           - flavorSuffix: ubuntu-latest
             image: ubuntu:latest
             arch: linux/amd64
-    uses: jaid/workflows/.github/workflows/pushDocker.yml@main
+    uses: jaid/docker-test/.github/workflows/.pushDocker.yml@main
     with:
       dockerHubUser: jaidchen
       buildArgs: image=${{ matrix.image }}
