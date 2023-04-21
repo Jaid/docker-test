@@ -236,6 +236,9 @@ jobs:
           const addVersionTag = getBooleanInput('addVersionTag')
           console.dir("addVersionTag")
           console.dir(addVersionTag)
+          const addVersionTag2 = core.getBooleanInput('addVersionTag')
+          console.dir("addVersionTag2")
+          console.dir(addVersionTag2)
           if (addVersionTag) {
             const versionTagPrefix = core.getInput('versionTagPrefix')
             console.dir("versionTagPrefix")
