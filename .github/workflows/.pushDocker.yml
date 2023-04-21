@@ -215,22 +215,43 @@ jobs:
               }
             }
           }
-          if (core.getMultilineInput('baseTags')) {
-            add(core.getMultilineInput('baseTags'))
+          const baseTags = core.getMultilineInput('baseTags')
+          console.dir("baseTags")
+          console.dir(baseTags)
+          if (baseTags.length) {
+            add(baseTags)
           }
-          if (core.getMultilineInput('additionalTags')) {
-            add(core.getMultilineInput('additionalTags'))
+          const additionalTags = core.getMultilineInput('additionalTags')
+          console.dir("additionalTags")
+          console.dir(additionalTags)
+          if (additionalTags.length) {
+            add(additionalTags)
           }
-          if (core.getInput('versionTag')) {
-            add(`type=raw,value=${core.getInput('versionTag')}}`)
+          const versionTag = core.getInput('versionTag')
+          console.dir("versionTag")
+          console.dir(versionTag)
+          if (versionTag.length) {
+            add(`type=raw,value=${versionTag}`)
           }
-          if (getBooleanInput('addVersionTag')) {
-            add(`type=pep440,pattern=${core.getInput('versionTagPrefix') ?? ''}{{version}}`)
+          const addVersionTag = getBooleanInput('addVersionTag')
+          console.dir("addVersionTag")
+          console.dir(addVersionTag)
+          if (addVersionTag) {
+            const versionTagPrefix = core.getInput('versionTagPrefix')
+            console.dir("versionTagPrefix")
+            console.dir(versionTagPrefix)
+            add(`type=pep440,pattern=${versionTagPrefix ?? ''}{{version}}`)
           }
-          if (getBooleanInput('addShaTags')) {
+          const addShaTags = getBooleanInput('addShaTags')
+          console.dir("addShaTags")
+          console.dir(addShaTags)
+          if (addShaTags) {
             add('type=sha,format=long')
           }
-          if (getBooleanInput('addScheduleTags')) {
+          const addScheduleTags = getBooleanInput('addScheduleTags')
+          console.dir("addScheduleTags")
+          console.dir(addScheduleTags)
+          if (addScheduleTags) {
             add('type=schedule,pattern=nightly')
             add('type=schedule,pattern={{date \'YYYYMMDD\'}}')
           }
