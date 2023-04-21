@@ -210,7 +210,7 @@ jobs:
           add(inputs.baseTags)
           add(inputs.additionalTags)
           if (inputs.versionTag) {
-            add(`type=raw,value=${versionTag}`)
+            add(`type=raw,value=${inputs.versionTag}`)
           }
           if (inputs.addVersionTag) {
             add(`type=pep440,pattern=${inputs.versionTagPrefix ?? ''}{{version}}`)
