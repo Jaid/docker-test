@@ -125,6 +125,10 @@ jobs:
         uses: actions/setup-node@v3.6.0
         with:
           node-version: current
+      - name: installActionsToolkitNode
+        shell: bash
+        run: |
+          npm install @actions/core
       - name: getDockerHubTokenLength
         id: getDockerHubTokenLength
         shell: bash
@@ -188,6 +192,7 @@ jobs:
         env:
           inputs: ${{ toJSON(inputs) }}
         run: |
+          import {core} from '@actions/core'
           const inputs = JSON.parse(process.env.inputs)
           const tags = []
           const add = input => {
