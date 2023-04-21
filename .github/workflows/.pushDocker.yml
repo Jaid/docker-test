@@ -192,7 +192,6 @@ jobs:
         run: |
           import { context } from '@actions/github'
           import core from '@actions/core'
-          console.dir(context)
           // TODO I have no idea why this is necessary, but sometimes boolean inputs are not recognized as such and will be returned as empty strings
           const getBooleanInput = key => {
             const value = core.getInput(key)
@@ -202,12 +201,12 @@ jobs:
             return core.getBooleanInput(key)
           }
           const tags = []
-          const add = tags => {
+          const add = input => {
             let addition
-            if (typeof tags === 'string') {
-              addition = tags.split('\n')
+            if (typeof input === 'string') {
+              addition = input.split('\n')
             } else {
-              addition = tags
+              addition = input
             }
             for (const tag of addition) {
               if (tag.length) {
