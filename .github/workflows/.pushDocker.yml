@@ -217,23 +217,23 @@ jobs:
             }
           }
           if (core.getMultilineInput('baseTags')) {
-            tags.push(core.getMultilineInput('baseTags'))
+            add(core.getMultilineInput('baseTags'))
           }
           if (core.getMultilineInput('additionalTags')) {
-            tags.push(core.getMultilineInput('additionalTags'))
+            add(core.getMultilineInput('additionalTags'))
           }
           if (core.getInput('versionTag')) {
-            tags.push(`type=raw,value=${core.getInput('versionTag')}}`)
+            add(`type=raw,value=${core.getInput('versionTag')}}`)
           }
           if (getBooleanInput('addVersionTag')) {
-            tags.push(`type=pep440,pattern=${core.getInput('versionTagPrefix') ?? ''}{{version}}`)
+            add(`type=pep440,pattern=${core.getInput('versionTagPrefix') ?? ''}{{version}}`)
           }
           if (getBooleanInput('addShaTags')) {
-            tags.push('type=sha,format=long')
+            add('type=sha,format=long')
           }
           if (getBooleanInput('addScheduleTags')) {
-            tags.push('type=schedule,pattern=nightly')
-            tags.push('type=schedule,pattern={{date \'YYYYMMDD\'}}')
+            add('type=schedule,pattern=nightly')
+            add('type=schedule,pattern={{date \'YYYYMMDD\'}}')
           }
           if (!tags.length) {
             core.error('No tags given')
