@@ -33,12 +33,12 @@ jobs:
           - flavorSuffix: debian
             image: debian:stable-slim
             arch: linux/amd64
-          # - image: ubuntu:rolling
-          #   arch: linux/amd64,linux/arm64/v8
-          # - flavorSuffix: ubuntu-latest
-          #   image: ubuntu:latest
-          #   arch: linux/amd64
-    uses: jaid/docker-test/.github/workflows/.pushDocker.yml@main
+          - image: ubuntu:rolling
+            arch: linux/amd64,linux/arm64/v8
+          - flavorSuffix: ubuntu-latest
+            image: ubuntu:latest
+            arch: linux/amd64
+    uses: jaid/workflows/.github/workflows/pushDocker.yml@main
     with:
       dockerHubUser: jaidchen
       buildArgs: image=${{ matrix.image }}
