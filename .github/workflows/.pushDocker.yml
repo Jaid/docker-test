@@ -128,7 +128,7 @@ jobs:
       - name: installActionsToolkitNode
         shell: bash
         run: |
-          npm install @actions/core
+          npm install @actions/core @actions/github
       - name: getDockerHubTokenLength
         id: getDockerHubTokenLength
         shell: bash
@@ -190,7 +190,9 @@ jobs:
         id: getTags
         shell: sh -c "node --input-type module < {0}"
         run: |
+          import { context } from '@actions/github'
           import core from '@actions/core'
+          console.dir(context)
           // TODO I have no idea why this is necessary, but sometimes boolean inputs are not recognized as such and will be returned as empty strings
           const getBooleanInput = key => {
             const value = core.getInput(key)
