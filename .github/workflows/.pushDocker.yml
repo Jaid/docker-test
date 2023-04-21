@@ -125,10 +125,6 @@ jobs:
         uses: actions/setup-node@v3.6.0
         with:
           node-version: current
-      - name: installActionsToolkitNode
-        shell: bash
-        run: |
-          npm install @actions/core @actions/github
       - name: getDockerHubTokenLength
         id: getDockerHubTokenLength
         shell: bash
@@ -193,18 +189,11 @@ jobs:
           inputs: ${{ toJSON(inputs) }}
         run: |
           const inputs = JSON.parse(process.env.inputs)
-          import core from '@actions/core'
-          console.dir(inputs)
-          // TODO I have no idea why this is necessary, but sometimes boolean inputs are not recognized as such and will be returned as empty strings
-          const getBooleanInput = key => {
-            const value = core.getInput(key)
-            if (!value.length) {
-              return false
-            }
-            return core.getBooleanInput(key)
-          }
           const tags = []
           const add = input => {
+            if (!input) {
+              return
+            }
             let addition
             if (typeof input === 'string') {
               addition = input.split('\n')
@@ -212,52 +201,24 @@ jobs:
               addition = input
             }
             for (const tag of addition) {
-              if (tag.length) {
+              if (tag) {
                 console.dir(tag)
-                tags.push(tag)
+                tags.push(tag.trim())
               }
             }
           }
-          const baseTags = core.getMultilineInput('baseTags')
-          console.dir("baseTags")
-          console.dir(baseTags)
-          if (baseTags.length) {
-            add(baseTags)
-          }
-          const additionalTags = core.getMultilineInput('additionalTags')
-          console.dir("additionalTags")
-          console.dir(additionalTags)
-          if (additionalTags.length) {
-            add(additionalTags)
-          }
-          const versionTag = core.getInput('versionTag')
-          console.dir("versionTag")
-          console.dir(versionTag)
-          if (versionTag.length) {
+          add(inputs.baseTags)
+          add(inputs.additionalTags)
+          if (inputs.versionTag) {
             add(`type=raw,value=${versionTag}`)
           }
-          const addVersionTag = getBooleanInput('addVersionTag')
-          console.dir("addVersionTag")
-          console.dir(addVersionTag)
-          const addVersionTag2 = core.getBooleanInput('addVersionTag')
-          console.dir("addVersionTag2")
-          console.dir(addVersionTag2)
-          if (addVersionTag) {
-            const versionTagPrefix = core.getInput('versionTagPrefix')
-            console.dir("versionTagPrefix")
-            console.dir(versionTagPrefix)
-            add(`type=pep440,pattern=${versionTagPrefix ?? ''}{{version}}`)
+          if (inputs.addVersionTag) {
+            add(`type=pep440,pattern=${inputs.versionTagPrefix ?? ''}{{version}}`)
           }
-          const addShaTags = getBooleanInput('addShaTags')
-          console.dir("addShaTags")
-          console.dir(addShaTags)
-          if (addShaTags) {
+          if (inputs.addShaTags) {
             add('type=sha,format=long')
           }
-          const addScheduleTags = getBooleanInput('addScheduleTags')
-          console.dir("addScheduleTags")
-          console.dir(addScheduleTags)
-          if (addScheduleTags) {
+          if (inputs.addScheduleTags) {
             add('type=schedule,pattern=nightly')
             add('type=schedule,pattern={{date \'YYYYMMDD\'}}')
           }
@@ -265,8 +226,7 @@ jobs:
             core.error('No tags given')
             process.exit(1)
           }
-          console.dir(tags)
-          core.setOutput('tags', tags.map(tag => tag.trim()).join('\n'))
+          core.setOutput('tags', tags.join('\n'))
       - name: Checkout
         uses: actions/checkout@v3.5.0
       - name: Set up qemu
