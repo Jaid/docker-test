@@ -189,9 +189,12 @@ jobs:
       - name: getTags
         id: getTags
         shell: sh -c "node --input-type module < {0}"
+        env:
+          inputs: ${{ toJSON(inputs) }}
         run: |
-          import { context } from '@actions/github'
+          const inputs = JSON.parse(process.env.inputs)
           import core from '@actions/core'
+          console.dir(inputs)
           // TODO I have no idea why this is necessary, but sometimes boolean inputs are not recognized as such and will be returned as empty strings
           const getBooleanInput = key => {
             const value = core.getInput(key)
