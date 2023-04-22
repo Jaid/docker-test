@@ -2,6 +2,7 @@
 set -o errexit -o pipefail -o xtrace
 
 cat /etc/group
+cat /etc/passwd
 # shellcheck disable=SC2154
 groupadd --system --gid "$groupId" "$groupName"
 # shellcheck disable=SC2154,SC2312
