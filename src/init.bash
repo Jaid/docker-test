@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -o errexit -o pipefail -o xtrace
 
-addgroup --system --gid "$groupId" "$groupName"
-adduser --disabled-password --gecos '' --uid "$userId" --ingroup "$groupName" --home "$userHome" --no-create-home --shell /bin/bash "$userName"
+# shellcheck disable=SC2154
+groupadd --system --gid "$groupId" "$groupName"
+# shellcheck disable=SC2154,SC2312
+useradd --disabled-password --gecos '' --uid "$userId" --gid "$groupName" --home "$userHome" --no-create-home --shell "$(command -v bash)" "$userName"
 mkdir --parents "$userHome"/bin
-chown --recursive "$userId":"$groupId" "$userHome"
+chown --recursive "$userId:$groupId" "$userHome"

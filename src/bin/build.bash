@@ -22,11 +22,11 @@ if [[ -d /usr/sbin ]]; then
   ls -l --all --color --human-readable --literal /usr/sbin
 fi
 # shellcheck disable=SC2154
-addgroup --system --gid "$groupId" "$groupName"
-# shellcheck disable=SC2154
-adduser --disabled-password --gecos '' --uid "$userId" --ingroup "$groupName" --home "$userHome" --no-create-home --shell /bin/bash "$userName"
+groupadd --system --gid "$groupId" "$groupName"
+# shellcheck disable=SC2154,SC2312
+useradd --disabled-password --gecos '' --uid "$userId" --gid "$groupName" --home "$userHome" --no-create-home --shell "$(command -v bash)" "$userName"
 mkdir --parents "$userHome/bin"
-chown --recursive "$userId":"$groupId" "$userHome"
+chown --recursive "$userId:$groupId" "$userHome"
 
 # shellcheck disable=SC2154
 userBinFolder=$userHome/userBin
