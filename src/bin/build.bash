@@ -1,26 +1,7 @@
 #!/usr/bin/env bash
 set -o errexit -o pipefail -o xtrace
 
-if [[ -d /bin ]]; then
-  echo bin
-  ls -l --all --color --human-readable --literal /bin
-fi
-if [[ -d /usr/bin ]]; then
-  echo usr/bin
-  ls -l --all --color --human-readable --literal /usr/bin
-fi
-if [[ -d /usr/local/bin ]]; then
-  echo usr/local/bin
-  ls -l --all --color --human-readable --literal /usr/local/bin
-fi
-if [[ -d /sbin ]]; then
-  echo sbin
-  ls -l --all --color --human-readable --literal /sbin
-fi
-if [[ -d /usr/sbin ]]; then
-  echo usr/sbin
-  ls -l --all --color --human-readable --literal /usr/sbin
-fi
+cat /etc/group
 # shellcheck disable=SC2154
 groupadd --system --gid "$groupId" "$groupName"
 # shellcheck disable=SC2154,SC2312
