@@ -13,10 +13,23 @@ if [[ -n "$existingGroup1000" ]]; then
   echo "Group 1000 already exists: $existingGroup1000, moving to id 1001"
   groupmod --gid 1001 "$existingGroup1000"
 fi
-# shellcheck disable=SC2154
-groupadd --system --gid "$groupId" "$groupName"
+userAddArguments=()
 # shellcheck disable=SC2154,SC2312
-useradd --disabled-password --gecos '' --uid "$userId" --gid "$groupName" --home "$userHome" --no-create-home --shell "$(command -v bash)" "$userName"
+if [[ -d "$userHome" ]]; then
+  userAddArguments+=(--no-create-home)
+fi
+bashPath=$(command -v bash || true)
+if [[ -n "$bashPath" ]]; then
+  userAddArguments+=(--shell)
+  userAddArguments+=("$bashPath")
+fi
+if [[ -n "$groupName" ]]; then
+  # shellcheck disable=SC2154
+  groupadd --system --gid "$groupId" "$groupName"
+  userAddArguments+=(--gid)
+  userAddArguments+=("$groupName")
+fi
+useradd --uid "$userId" --home "$userHome" "$userName" "${userAddArguments[@]}"
 mkdir --parents "$userHome/bin"
 chown --recursive "$userId:$groupId" "$userHome"
 
