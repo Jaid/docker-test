@@ -1,21 +1,28 @@
 #!/usr/bin/env bash
 set -o errexit -o pipefail -o xtrace
 
-cat /etc/group
-cat /etc/passwd
-existingUser1000=$(id --name --user 1000)
-existingGroup1000=$(id --name --group 1000)
-if [[ -n "$existingUser1000" ]]; then
-  echo "User 1000 already exists: $existingUser1000, moving to id 1001"
-  usermod --uid 1001 "$existingUser1000"
+userId=${userId:-1000}
+userName=${userName:-}
+groupId=${groupId:-1000}
+groupName=${groupName:-$userName}
+userHome=${userHome:-}
+
+existingUser=$(id --name --user "$userId")
+existingGroup=$(id --name --group "$groupId")
+if [[ -n "$existingUser" ]]; then
+  usermod --uid 1001 "$existingUser"
 fi
-if [[ -n "$existingGroup1000" ]]; then
-  echo "Group 1000 already exists: $existingGroup1000, moving to id 1001"
-  groupmod --gid 1001 "$existingGroup1000"
+if [[ -n "$existingGroup" ]]; then
+  groupmod --gid 1001 "$existingGroup"
 fi
 userAddArguments=()
-# shellcheck disable=SC2154,SC2312
-if [[ -d "$userHome" ]]; then
+if [[ -n "$userHome" ]]; then
+  userAddArguments+=(--home)
+  userAddArguments+=("$userHome")
+  if [[ -d "$userHome" ]]; then
+    userAddArguments+=(--no-create-home)
+  fi
+else
   userAddArguments+=(--no-create-home)
 fi
 bashPath=$(command -v bash || true)
@@ -24,12 +31,12 @@ if [[ -n "$bashPath" ]]; then
   userAddArguments+=("$bashPath")
 fi
 if [[ -n "$groupName" ]]; then
-  # shellcheck disable=SC2154
   groupadd --system --gid "$groupId" "$groupName"
   userAddArguments+=(--gid)
   userAddArguments+=("$groupName")
 fi
 useradd --uid "$userId" --home "$userHome" "$userName" "${userAddArguments[@]}"
+
 mkdir --parents "$userHome/bin"
 chown --recursive "$userId:$groupId" "$userHome"
 
