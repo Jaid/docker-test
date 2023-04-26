@@ -3,6 +3,16 @@ set -o errexit -o pipefail -o xtrace
 
 cat /etc/group
 cat /etc/passwd
+existingUser1000=$(id --user 1000)
+existingGroup1000=$(id --group 1000)
+if [[ -n "$existingUser1000" ]]; then
+  echo "User 1000 already exists: $existingUser1000, moving to id 1001"
+  usermod --uid 1001 "$existingUser1000"
+fi
+if [[ -n "$existingGroup1000" ]]; then
+  echo "Group 1000 already exists: $existingGroup1000, moving to id 1001"
+  groupmod --gid 1001 "$existingGroup1000"
+fi
 # shellcheck disable=SC2154
 groupadd --system --gid "$groupId" "$groupName"
 # shellcheck disable=SC2154,SC2312
