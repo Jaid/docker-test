@@ -3,8 +3,8 @@ set -o errexit -o pipefail -o xtrace
 
 cat /etc/group
 cat /etc/passwd
-existingUser1000=$(id --user 1000)
-existingGroup1000=$(id --group 1000)
+existingUser1000=$(id --name --user 1000)
+existingGroup1000=$(id --name --group 1000)
 if [[ -n "$existingUser1000" ]]; then
   echo "User 1000 already exists: $existingUser1000, moving to id 1001"
   usermod --uid 1001 "$existingUser1000"
