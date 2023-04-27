@@ -27,17 +27,82 @@ jobs:
       contents: read
     needs: bump
     strategy:
+      matrix:
+        include:
+          # ubuntu:rolling
+          - flavorSuffix: amd64
+            image: ubuntu:rolling
+            arch: linux/amd64
+          - flavorSuffix: arm64
+            image: ubuntu:rolling
+            arch: linux/arm64/v8
+          # debian:stable-slim
+          - flavorSuffix: debian-amd64
+            image: debian:stable-slim
+            arch: linux/amd64
+          - flavorSuffix: debian-arm64
+            image: debian:stable-slim
+            arch: linux/arm64/v8
+          # ubuntu:latest
+          - flavorSuffix: lts-amd64
+            image: ubuntu:latest
+            arch: linux/amd64
+          - flavorSuffix: lts-arm64
+            image: ubuntu:latest
+            arch: linux/arm64/v8
+    uses: jaid/docker-test/.github/workflows/.pushDocker.yml@main
+    with:
+      dockerHubUser: jaidchen
+      buildArgs: image=${{ matrix.image }}
+      flavorSuffix: ${{ matrix.flavorSuffix }}
+      arch: ${{ matrix.arch }}
+      versionTag: ${{ needs.bump.outputs.newTag }}
+  pushDockerOptional:
+    name: Docker image ${{ matrix.flavorSuffix }}
+    permissions:
+      packages: write
+      contents: read
+    needs: bump
+    strategy:
       fail-fast: false
       matrix:
         include:
-          - flavorSuffix: debian
+          # ubuntu:rolling
+          - flavorSuffix: arm7
+            image: ubuntu:rolling
+            arch: linux/arm/v7
+          - flavorSuffix: ppc
+            image: ubuntu:rolling
+            arch: linux/ppc64le
+          - flavorSuffix: s390x
+            image: ubuntu:rolling
+            arch: linux/s390x
+          # debian:stable-slim
+          - flavorSuffix: debian-arm7
             image: debian:stable-slim
-            arch: linux/amd64
-          - image: ubuntu:rolling
-            arch: linux/amd64,linux/arm64/v8
-          - flavorSuffix: ubuntu-latest
+            arch: linux/arm/v7
+          - flavorSuffix: debian-ppc
+            image: debian:stable-slim
+            arch: linux/ppc64le
+          - flavorSuffix: debian-s390x
+            image: debian:stable-slim
+            arch: linux/s390x
+          - flavorSuffix: debian-386
+            image: debian:stable-slim
+            arch: linux/386
+          - flavorSuffix: debian-mips
+            image: debian:stable-slim
+            arch: linux/mips64le
+          # ubuntu:latest
+          - flavorSuffix: lts-arm7
             image: ubuntu:latest
-            arch: linux/amd64
+            arch: linux/arm/v7
+          - flavorSuffix: lts-ppc
+            image: ubuntu:latest
+            arch: linux/ppc64le
+          - flavorSuffix: lts-s390x
+            image: ubuntu:latest
+            arch: linux/s390x
     uses: jaid/docker-test/.github/workflows/.pushDocker.yml@main
     with:
       dockerHubUser: jaidchen
