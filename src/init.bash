@@ -7,8 +7,8 @@ groupId=${groupId:-1000}
 groupName=${groupName:-$userName}
 userHome=${userHome:-}
 
-existingUser=$(id --name --user "$userId")
-existingGroup=$(id --name --group "$groupId")
+existingUser=$(id --name --user "$userId" || true)
+existingGroup=$(id --name --group "$groupId" || true)
 if [[ -n "$existingUser" ]]; then
   usermod --uid 1001 "$existingUser"
 fi
