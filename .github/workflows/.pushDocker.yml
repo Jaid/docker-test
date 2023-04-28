@@ -190,7 +190,7 @@ jobs:
               }
             }
           }
-          arch = await getArch()
+          const arch = await getArch()
           setOutput('arch', arch)
       - name: getTags
         id: getTags
