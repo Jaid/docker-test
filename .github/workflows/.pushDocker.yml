@@ -128,15 +128,16 @@ jobs:
       - name: installActionsToolkitNode
         shell: bash
         run: |
-          npm install @actions/core
+          npm install @actions/core read-file-string
       - name: getDockerHubTokenLength
         id: getDockerHubTokenLength
-        shell: bash
+        shell: sh -c "node --input-type module < {0}"
         env:
-          dockerHubToken: ${{ secrets.dockerHubToken }}
+          secrets: ${{ toJSON(secrets) }}
         run: |
-          length=${#dockerHubToken}
-          printf 'length=%s' "$length" > $GITHUB_OUTPUT
+          import { setOutput } from '@actions/core'
+          const secrets = JSON.parse(process.env.secrets)
+          setOutput('length', secrets.dockerHubToken?.length ?? 0)
       - name: getCacheInstruction
         id: getCacheInstruction
         shell: bash
@@ -170,22 +171,27 @@ jobs:
           printf imageRefs=%s "$imageRefs" > $GITHUB_OUTPUT
       - name: getArch
         id: getArch
-        shell: bash
+        shell: sh -c "node --input-type module < {0}"
         env:
-          givenArch: ${{ inputs.arch }}
+          inputs: ${{ toJSON(inputs) }}
         run: |
-          if [[ -n $givenArch ]]; then
-            arch=$givenArch
-          elif [[ -f arch.lines ]]; then
-            readarray -t archs < arch.lines
-            function joinBy {
-              local IFS="$1"; shift; echo "$*"
+          import { setOutput } from '@actions/core'
+          import readFileString from 'read-file-string'
+          const inputs = JSON.parse(process.env.inputs)
+          const getArch = async () => {
+            if (inputs.arch?.length) {
+              return inputs.arch
+            } else {
+              await archLines = await readFileString('arch.lines')
+              if (archLines) {
+                return archLines.split('\n').map(line => line.trim()).filter(Boolean).join(',')
+              } else {
+                return 'linux/amd64,linux/arm/v7,linux/arm64/v8'
+              }
             }
-            arch=$(joinBy , "${archs[@]}");
-          else
-            arch=linux/amd64,linux/arm/v7,linux/arm64/v8,linux/ppc64le,linux/riscv64,linux/s390x
-          fi
-          printf arch=%s "$arch" > $GITHUB_OUTPUT
+          }
+          arch = await getArch()
+          setOutput('arch', arch)
       - name: getTags
         id: getTags
         shell: sh -c "node --input-type module < {0}"
