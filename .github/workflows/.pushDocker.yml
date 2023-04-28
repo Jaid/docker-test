@@ -198,7 +198,7 @@ jobs:
         env:
           inputs: ${{ toJSON(inputs) }}
         run: |
-          import * as core from '@actions/core'
+          import * as core, { setOutput } from '@actions/core'
           const inputs = JSON.parse(process.env.inputs)
           const tags = []
           const add = input => {
@@ -237,11 +237,14 @@ jobs:
             core.error('No tags given')
             process.exit(1)
           }
-          core.setOutput('tags', tags.join('\n'))
+          setOutput('tags', tags.join('\n'))
       - name: Checkout
         uses: actions/checkout@v3.5.0
       - name: Set up qemu
+        if: ${{ steps.getArch.outputs.arch != 'linux/amd64' }}
         uses: docker/setup-qemu-action@v2.1.0
+        with:
+          platforms: ${{ steps.getArch.outputs.arch }}
       - name: Set up buildx
         uses: docker/setup-buildx-action@v2.5.0
       - name: Login to ${{ inputs.dockerHubRegistry }}
