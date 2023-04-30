@@ -1,4 +1,4 @@
-name: pushDocker
+name: testDocker
 on:
   workflow_call:
     inputs:

@@ -28,7 +28,6 @@ jobs:
     uses: jaid/docker-test/.github/workflows/.testDocker.yml@main
     with:
       buildArgs: image=ubuntu:rolling
-      versionTag: ${{ needs.bump.outputs.newTag }}
   pushDocker:
     name: Docker image ${{ matrix.flavorSuffix }}
     permissions:
