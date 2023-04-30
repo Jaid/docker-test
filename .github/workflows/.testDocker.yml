@@ -78,4 +78,3 @@ jobs:
           build-args: ${{ inputs.buildArgs }}
           # cache-from: ${{ steps.getCacheInstruction.outputs.cache-from }}
           # cache-to: ${{ steps.getCacheInstruction.outputs.cache-to }}
-          push: true
