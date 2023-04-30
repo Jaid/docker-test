@@ -42,7 +42,7 @@ jobs:
           inputs: ${{ toJSON(inputs) }}
         run: |
           import { setOutput } from '@actions/core'
-          import { default: readFileString } from 'read-file-string'
+          import { default as readFileString } from 'read-file-string'
           const inputs = JSON.parse(process.env.inputs)
           const getArch = async () => {
             if (inputs.arch?.length) {
