@@ -43,7 +43,9 @@ jobs:
         run: |
           import { setOutput } from '@actions/core'
           import readFileString, { default as readF } from 'read-file-string'
-          console.dir(readFileString)
+          console.dir(readFileString.default)
+          console.dir(readFileString.default.default)
+          console.dir(readF)
           console.dir(readF)
           const inputs = JSON.parse(process.env.inputs)
           const getArch = async () => {
