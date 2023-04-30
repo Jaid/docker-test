@@ -23,7 +23,6 @@ jobs:
     name: ${{ github.event_name }}
     runs-on: ubuntu-latest
     permissions:
-      packages: write
       contents: read
     outputs:
       meta: ${{ steps.dockerPush.outputs.metadata }}
