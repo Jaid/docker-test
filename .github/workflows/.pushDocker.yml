@@ -125,7 +125,7 @@ jobs:
         uses: actions/setup-node@v3.6.0
         with:
           node-version: current
-      - name: installActionsToolkitNode
+      - name: installNodePackages
         shell: bash
         run: |
           npm install @actions/core read-file-string
