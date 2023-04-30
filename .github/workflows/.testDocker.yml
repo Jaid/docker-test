@@ -27,6 +27,8 @@ jobs:
     outputs:
       meta: ${{ steps.dockerPush.outputs.metadata }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3.5.0
       - name: setupNode
         uses: actions/setup-node@v3.6.0
         with:
@@ -56,11 +58,11 @@ jobs:
           const inputs = JSON.parse(process.env.inputs)
           const getArch = async () => {
             if (inputs.arch?.length) {
-              return inputs.arch
+              return inputs.arch.split(',')
             } else {
-                const archLines = await readFileString.default('arch.lines')
+              const archLines = await readFileString.default('arch.lines')
               if (archLines) {
-                return archLines.split('\n').map(line => line.trim()).filter(Boolean).join(',')
+                return archLines.split('\n').map(line => line.trim()).filter(Boolean)
               } else {
                 return ['linux/amd64']
               }
@@ -68,8 +70,6 @@ jobs:
           }
           const archs = await getArch()
           setOutput('arch', archs.split('\n'))
-      - name: Checkout
-        uses: actions/checkout@v3.5.0
       - name: Set up qemu
         if: ${{ steps.getArch.outputs.arch != 'linux/amd64' }}
         uses: docker/setup-qemu-action@v2.1.0
