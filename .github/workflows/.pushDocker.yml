@@ -121,6 +121,8 @@ jobs:
       imageUser: ${{ needs.getDockerImageName.outputs.imageUser }}
       imageName: ${{ needs.getDockerImageName.outputs.imageName }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3.5.0
       - name: setupNode
         uses: actions/setup-node@v3.6.0
         with:
@@ -129,11 +131,12 @@ jobs:
         shell: bash
         run: |
           cd ..
-          npm install --no-package-lock @actions/core read-file-string
+          npm install --no-package-lock --no-save @actions/core read-file-string
       - name: ls
         shell: bash
         run: |
           ls -lah ..
+          ls -lah ../node_modules
           ls -lah .
       - name: getDockerHubTokenLength
         id: getDockerHubTokenLength
@@ -244,8 +247,6 @@ jobs:
             process.exit(1)
           }
           setOutput('tags', tags.join('\n'))
-      - name: Checkout
-        uses: actions/checkout@v3.5.0
       - name: Set up qemu
         if: ${{ steps.getArch.outputs.arch != 'linux/amd64' }}
         uses: docker/setup-qemu-action@v2.1.0
