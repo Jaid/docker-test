@@ -34,7 +34,7 @@ jobs:
       - name: installActionsToolkitNode
         shell: bash
         run: |
-          npm install @actions/core read-file-string
+          npm install @actions/core @actions/exec read-file-string execa
       - name: getArch
         id: getArch
         shell: sh -c "node --input-type module < {0}"
@@ -82,3 +82,12 @@ jobs:
           build-args: ${{ inputs.buildArgs }}
           # cache-from: ${{ steps.getCacheInstruction.outputs.cache-from }}
           # cache-to: ${{ steps.getCacheInstruction.outputs.cache-to }}
+      - name: Run Docker image
+        shell: sh -c "node --input-type module < {0}"
+        env:
+          inputs: ${{ toJSON(inputs) }}
+        run: |
+          import { setOutput } from '@actions/core'
+          import execa from 'execa'
+          console.dir(execa)
+          await execa('docker', ['run', '--rm', 'test'], {all: true, verbose: true, stdio: 'inherit'})
