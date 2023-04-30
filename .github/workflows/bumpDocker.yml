@@ -20,12 +20,23 @@ jobs:
     uses: jaid/workflows/.github/workflows/bump.yml@main
     with:
       bumpAmount: ${{ inputs.bumpAmount }}
+  testDocker:
+    name: Test Docker
+    permissions:
+      contents: read
+    needs: bump
+    uses: jaid/docker-test/.github/workflows/.testDocker.yml@main
+    with:
+      buildArgs: image=ubuntu:rolling
+      versionTag: ${{ needs.bump.outputs.newTag }}
   pushDocker:
     name: Docker image ${{ matrix.flavorSuffix }}
     permissions:
       packages: write
       contents: read
-    needs: bump
+    needs:
+      - testDocker
+      - bump
     strategy:
       matrix:
         include:
@@ -62,7 +73,7 @@ jobs:
     permissions:
       packages: write
       contents: read
-    needs: bump
+    needs: testDocker
     strategy:
       fail-fast: false
       matrix:

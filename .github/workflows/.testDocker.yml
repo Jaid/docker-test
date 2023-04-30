@@ -1,0 +1,82 @@
+name: pushDocker
+on:
+  workflow_call:
+    inputs:
+      arch:
+        type: string
+        required: false
+        default: ''
+        description: List of image archs to build, comma separated without spaces
+      buildContext:
+        type: string
+        required: false
+        default: src
+      buildArgs:
+        type: string
+        required: false
+        default: ''
+    outputs:
+      meta:
+        value: ${{ jobs.job.outputs.meta }}
+jobs:
+  job:
+    name: ${{ github.event_name }}
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    outputs:
+      meta: ${{ steps.dockerPush.outputs.metadata }}
+    steps:
+      - name: setupNode
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: current
+      - name: installActionsToolkitNode
+        shell: bash
+        run: |
+          npm install @actions/core read-file-string
+      - name: getArch
+        id: getArch
+        shell: sh -c "node --input-type module < {0}"
+        env:
+          inputs: ${{ toJSON(inputs) }}
+        run: |
+          import { setOutput } from '@actions/core'
+          import readFileString from 'read-file-string'
+          const inputs = JSON.parse(process.env.inputs)
+          const getArch = async () => {
+            if (inputs.arch?.length) {
+              return inputs.arch
+            } else {
+                archLines = await readFileString('arch.lines')
+              if (archLines) {
+                return archLines.split('\n').map(line => line.trim()).filter(Boolean).join(',')
+              } else {
+                return 'linux/amd64'
+              }
+            }
+          }
+          const arch = await getArch()
+          setOutput('arch', arch)
+      - name: Checkout
+        uses: actions/checkout@v3.5.0
+      - name: Set up qemu
+        if: ${{ steps.getArch.outputs.arch != 'linux/amd64' }}
+        uses: docker/setup-qemu-action@v2.1.0
+        with:
+          platforms: ${{ steps.getArch.outputs.arch }}
+      - name: Set up buildx
+        uses: docker/setup-buildx-action@v2.5.0
+      - name: dockerPush
+        id: dockerPush
+        uses: docker/build-push-action@v4.0.0
+        with:
+          context: ${{ inputs.buildContext }}
+          platforms: ${{ steps.getArch.outputs.arch }}
+          tags: test
+          # labels: ${{ steps.meta.outputs.labels }}
+          build-args: ${{ inputs.buildArgs }}
+          # cache-from: ${{ steps.getCacheInstruction.outputs.cache-from }}
+          # cache-to: ${{ steps.getCacheInstruction.outputs.cache-to }}
+          push: true
