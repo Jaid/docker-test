@@ -34,7 +34,13 @@ jobs:
       - name: installNodePackages
         shell: bash
         run: |
-          npm install @actions/core read-file-string execa
+          cd ..
+          npm install --no-package-lock @actions/core read-file-string
+      - name: ls
+        shell: bash
+        run: |
+          ls -lah ..
+          ls -lah .
       - name: getArch
         id: getArch
         shell: sh -c "node --input-type module < {0}"
