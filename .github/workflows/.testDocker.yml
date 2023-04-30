@@ -66,7 +66,7 @@ jobs:
             }
           }
           const archs = await getArch()
-          setOutput('arch', archs.split('\n'))
+          setOutput('arch', archs.join('\n'))
       - name: Set up qemu
         if: ${{ steps.getArch.outputs.arch != 'linux/amd64' }}
         uses: docker/setup-qemu-action@v2.1.0
