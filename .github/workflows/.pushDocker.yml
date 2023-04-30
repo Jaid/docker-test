@@ -128,7 +128,13 @@ jobs:
       - name: installNodePackages
         shell: bash
         run: |
-          npm install @actions/core read-file-string
+          cd ..
+          npm install --no-package-lock @actions/core read-file-string
+      - name: ls
+        shell: bash
+        run: |
+          ls -lah ..
+          ls -lah .
       - name: getDockerHubTokenLength
         id: getDockerHubTokenLength
         shell: sh -c "node --input-type module < {0}"

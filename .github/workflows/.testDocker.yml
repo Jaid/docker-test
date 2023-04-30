@@ -56,12 +56,12 @@ jobs:
               if (archLines) {
                 return archLines.split('\n').map(line => line.trim()).filter(Boolean).join(',')
               } else {
-                return 'linux/amd64'
+                return ['linux/amd64']
               }
             }
           }
-          const arch = await getArch()
-          setOutput('arch', arch)
+          const archs = await getArch()
+          setOutput('arch', archs.split('\n'))
       - name: Checkout
         uses: actions/checkout@v3.5.0
       - name: Set up qemu
