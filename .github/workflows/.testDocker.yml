@@ -81,16 +81,13 @@ jobs:
           context: ${{ inputs.buildContext }}
           platforms: ${{ steps.getArch.outputs.arch }}
           tags: test
-          # labels: ${{ steps.meta.outputs.labels }}
           build-args: ${{ inputs.buildArgs }}
-          # cache-from: ${{ steps.getCacheInstruction.outputs.cache-from }}
-          # cache-to: ${{ steps.getCacheInstruction.outputs.cache-to }}
       - name: Run Docker image
         shell: sh -c "node --input-type module < {0}"
         env:
           inputs: ${{ toJSON(inputs) }}
         run: |
           import { setOutput } from '@actions/core'
-          import execa from 'execa'
+          import { execa } from 'execa'
           console.dir(execa)
           await execa('docker', ['run', '--rm', 'test'], {all: true, verbose: true, stdio: 'inherit'})
