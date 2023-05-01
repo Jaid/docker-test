@@ -98,4 +98,5 @@ jobs:
           console.dir(execa)
           await execa('docker', ['image', 'list', '--all'], {all: true, verbose: true, stdio: 'inherit'})
           await execa('docker', ['load', '-i', '../image.tar'], {all: true, verbose: true, stdio: 'inherit'})
+          await execa('docker', ['image', 'list', '--all'], {all: true, verbose: true, stdio: 'inherit'})
           await execa('docker', ['run', '--rm', 'image'], {all: true, verbose: true, stdio: 'inherit'})
