@@ -81,7 +81,9 @@ jobs:
           context: ${{ inputs.buildContext }}
           platforms: ${{ steps.getArch.outputs.arch }}
           build-args: ${{ inputs.buildArgs }}
-          outputs: type=docker,dest=../image.tar
+          outputs: type=docker,dest=../image
+          tags: test
+          load: true
       - name: ls2
         shell: bash
         run: |
@@ -97,6 +99,6 @@ jobs:
           import { execa } from 'execa'
           console.dir(execa)
           await execa('docker', ['image', 'list', '--all'], {all: true, verbose: true, stdio: 'inherit'})
-          await execa('docker', ['load', '-i', '../image.tar'], {all: true, verbose: true, stdio: 'inherit'})
+          await execa('docker', ['load', '-i', '../image'], {all: true, verbose: true, stdio: 'inherit'})
           await execa('docker', ['image', 'list', '--all'], {all: true, verbose: true, stdio: 'inherit'})
-          await execa('docker', ['run', '--rm', 'image'], {all: true, verbose: true, stdio: 'inherit'})
+          await execa('docker', ['run', '--rm', 'test'], {all: true, verbose: true, stdio: 'inherit'})
