@@ -81,15 +81,19 @@ jobs:
           context: ${{ inputs.buildContext }}
           platforms: ${{ steps.getArch.outputs.arch }}
           build-args: ${{ inputs.buildArgs }}
-          outputs: type=docker,dest=../image
+          outputs: type=docker,dest=../.image
           tags: test
           load: true
       - name: ls2
         shell: bash
         run: |
+          set -o xtrace
           ls -lah ..
           ls -lah ../node_modules
           ls -lah .
+          ls -lah ../.image
+          env
+          echo ${{ runner.temp }}
       - name: Run Docker image
         shell: sh -c "node --input-type module < {0}"
         env:
