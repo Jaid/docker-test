@@ -15,6 +15,14 @@ on:
         type: string
         required: false
         default: ''
+      runArgs:
+        type: string
+        required: false
+        default: --init
+      appArgs:
+        type: string
+        required: false
+        default: ''
     outputs:
       meta:
         value: ${{ jobs.job.outputs.meta }}
@@ -101,8 +109,13 @@ jobs:
         run: |
           import { setOutput } from '@actions/core'
           import { execa } from 'execa'
-          console.dir(execa)
-          await execa('docker', ['image', 'list', '--all'], {all: true, verbose: true, stdio: 'inherit'})
-          await execa('docker', ['load', '-i', '../image'], {all: true, verbose: true, stdio: 'inherit'})
-          await execa('docker', ['image', 'list', '--all'], {all: true, verbose: true, stdio: 'inherit'})
-          await execa('docker', ['run', '--rm', 'test'], {all: true, verbose: true, stdio: 'inherit'})
+          const inputs = JSON.parse(process.env.inputs)
+          const args = ['run', '--rm']
+          if (inputs.runArgs) {
+            args.push(...inputs.runArgs.split(' '))
+          }
+          args.push('test')
+          if (inputs.appArgs) {
+            args.push(...inputs.appArgs.split(' '))
+          }
+          await execa('docker', args, {all: true, verbose: true, stdio: 'inherit'})
