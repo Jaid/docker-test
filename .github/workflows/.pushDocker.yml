@@ -207,7 +207,7 @@ jobs:
         env:
           inputs: ${{ toJSON(inputs) }}
         run: |
-          import * as core, { setOutput } from '@actions/core'
+          import { setOutput }, * as core from '@actions/core'
           const inputs = JSON.parse(process.env.inputs)
           const tags = []
           const add = input => {
