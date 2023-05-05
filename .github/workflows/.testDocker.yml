@@ -89,19 +89,9 @@ jobs:
           context: ${{ inputs.buildContext }}
           platforms: ${{ steps.getArch.outputs.arch }}
           build-args: ${{ inputs.buildArgs }}
-          outputs: type=docker,dest=../.image
+          outputs: type=docker,dest=${{ runner.temp }}/testImage.tar
           tags: test
           load: true
-      - name: ls2
-        shell: bash
-        run: |
-          set -o xtrace
-          ls -lah ..
-          ls -lah ../node_modules
-          ls -lah .
-          ls -lah ../.image
-          env
-          echo ${{ runner.temp }}
       - name: Run Docker image
         shell: sh -c "node --input-type module < {0}"
         env:
@@ -110,6 +100,7 @@ jobs:
           import { setOutput } from '@actions/core'
           import { execa } from 'execa'
           const inputs = JSON.parse(process.env.inputs)
+          await execa('docker', ['load', '--input', `${process.env.RUNNER_TEMP}/testImage.tar`], {all: true, verbose: true, stdio: 'inherit'})
           const args = ['run', '--rm']
           if (inputs.runArgs) {
             args.push(...inputs.runArgs.split(' '))
