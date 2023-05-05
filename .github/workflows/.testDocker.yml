@@ -58,7 +58,7 @@ jobs:
         env:
           inputs: ${{ toJSON(inputs) }}
         run: |
-          import { setOutput } from '@actions/core'
+          import * as core from '@actions/core'
           import readFileString from 'read-file-string'
           const inputs = JSON.parse(process.env.inputs)
           const getArch = async () => {
@@ -74,7 +74,7 @@ jobs:
             }
           }
           const archs = await getArch()
-          setOutput('arch', archs.join('\n'))
+          core.setOutput('arch', archs.join('\n'))
       - name: Set up qemu
         if: ${{ steps.getArch.outputs.arch != 'linux/amd64' }}
         uses: docker/setup-qemu-action@v2.1.0
@@ -97,7 +97,7 @@ jobs:
         env:
           inputs: ${{ toJSON(inputs) }}
         run: |
-          import { setOutput } from '@actions/core'
+          import * as core from '@actions/core'
           import { execa } from 'execa'
           const inputs = JSON.parse(process.env.inputs)
           await execa('docker', ['load', '--input', `${process.env.RUNNER_TEMP}/testImage.tar`], {all: true, verbose: true, stdio: 'inherit'})

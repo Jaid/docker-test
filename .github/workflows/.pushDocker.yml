@@ -144,9 +144,9 @@ jobs:
         env:
           secrets: ${{ toJSON(secrets) }}
         run: |
-          import { setOutput } from '@actions/core'
+          import * as core from '@actions/core'
           const secrets = JSON.parse(process.env.secrets)
-          setOutput('length', secrets.dockerHubToken?.length ?? 0)
+          core.setOutput('length', secrets.dockerHubToken?.length ?? 0)
       - name: getCacheInstruction
         id: getCacheInstruction
         shell: bash
@@ -184,7 +184,7 @@ jobs:
         env:
           inputs: ${{ toJSON(inputs) }}
         run: |
-          import { setOutput } from '@actions/core'
+          import * as core from '@actions/core'
           import readFileString from 'read-file-string'
           const inputs = JSON.parse(process.env.inputs)
           const getArch = async () => {
@@ -200,14 +200,14 @@ jobs:
             }
           }
           const arch = await getArch()
-          setOutput('arch', arch)
+          core.setOutput('arch', arch)
       - name: getTags
         id: getTags
         shell: sh -c "node --input-type module < {0}"
         env:
           inputs: ${{ toJSON(inputs) }}
         run: |
-          import { setOutput }, * as core from '@actions/core'
+          import * as core from '@actions/core'
           const inputs = JSON.parse(process.env.inputs)
           const tags = []
           const add = input => {
@@ -246,7 +246,7 @@ jobs:
             core.error('No tags given')
             process.exit(1)
           }
-          setOutput('tags', tags.join('\n'))
+          core.setOutput('tags', tags.join('\n'))
       - name: Set up qemu
         if: ${{ steps.getArch.outputs.arch != 'linux/amd64' }}
         uses: docker/setup-qemu-action@v2.1.0
