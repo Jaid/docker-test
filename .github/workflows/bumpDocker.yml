@@ -21,15 +21,15 @@ jobs:
     with:
       bumpAmount: ${{ inputs.bumpAmount }}
   testDocker:
-    name: Test Docker
+    name: test
     permissions:
       contents: read
     needs: bump
-    uses: jaid/docker-test/.github/workflows/.testDocker.yml@main
+    uses: jaid/workflows/.github/workflows/testDocker.yml@main
     with:
       buildArgs: image=ubuntu:rolling
   pushDocker:
-    name: Docker image ${{ matrix.flavorSuffix }}
+    name: push (${{ matrix.flavorSuffix }})
     permissions:
       packages: write
       contents: read
@@ -60,7 +60,7 @@ jobs:
           - flavorSuffix: lts-arm64
             image: ubuntu:latest
             arch: linux/arm64/v8
-    uses: jaid/docker-test/.github/workflows/.pushDocker.yml@main
+    uses: jaid/workflows/.github/workflows/pushDocker.yml@main
     with:
       dockerHubUser: jaidchen
       buildArgs: image=${{ matrix.image }}
@@ -68,7 +68,7 @@ jobs:
       arch: ${{ matrix.arch }}
       versionTag: ${{ needs.bump.outputs.newTag }}
   pushDockerOptional:
-    name: Docker image ${{ matrix.flavorSuffix }}
+    name: push (${{ matrix.flavorSuffix }}, optional)
     permissions:
       packages: write
       contents: read
@@ -113,7 +113,7 @@ jobs:
           - flavorSuffix: lts-s390x
             image: ubuntu:latest
             arch: linux/s390x
-    uses: jaid/docker-test/.github/workflows/.pushDocker.yml@main
+    uses: jaid/workflows/.github/workflows/pushDocker.yml@main
     with:
       dockerHubUser: jaidchen
       buildArgs: image=${{ matrix.image }}
