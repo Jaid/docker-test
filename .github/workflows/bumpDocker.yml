@@ -67,12 +67,15 @@ jobs:
       flavorSuffix: ${{ matrix.flavorSuffix }}
       arch: ${{ matrix.arch }}
       versionTag: ${{ needs.bump.outputs.newTag }}
+      versionTagSemverPrefix: ''
   pushDockerOptional:
     name: push (${{ matrix.flavorSuffix }}, optional)
     permissions:
       packages: write
       contents: read
-    needs: testDocker
+    needs:
+      - bump
+      - testDocker
     strategy:
       fail-fast: false
       matrix:
