@@ -50,7 +50,7 @@ find "$userBinFolder" -maxdepth 1 -type f -printf '%P\0' | while read -r -d $'\0
 done
 
 aptGet update
-aptGet install curl build-essential flex texinfo gettext automake pkg-config cmake
+aptGet install git curl build-essential flex texinfo gettext automake pkg-config cmake
 downloadGithubArchive krallin/tini tini sha 378bbbc8909a960e89de220b1a4e50781233a740
 
 cd tini
