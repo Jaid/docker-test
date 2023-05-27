@@ -57,9 +57,10 @@ jobs:
         env:
           inputs: ${{ toJSON(inputs) }}
         run: |
+          import core from "@actions/core";
           import { matches, firstMatch } from "super-regex";
           import { VM } from "vm2";
-          import core from "@actions/core";
+          const inputs = JSON.parse(process.env.inputs);
 
           const matchAll = (regex, string) => {
             return Array.from(
@@ -78,7 +79,6 @@ jobs:
             return vm.run(code);
           };
 
-          const inputs = JSON.parse(process.env.inputs);
           const bases = inputs.bases
             ? matchAll(/(?<match>[\w-_:]+)/g, inputs.bases).map((match) => match.match)
             : [""];
