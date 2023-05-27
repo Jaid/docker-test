@@ -11,10 +11,19 @@ on:
         required: false
         type: string
         default: linux/amd64 linux/arm64/v8
-      additions:
+      additionEvals:
         description: List of additional values, javascript object code without outer braces
         required: false
         type: string
+      idEval:
+        description: Javascript code to generate the id
+        required: false
+        type: string
+        default: |
+          [
+            baseShortcuts[base],
+            platformShortcuts[platform] ?? platform.replaceAll('/', '_')
+          ].filter(Boolean).join('-')
     outputs:
       output:
         description: The dynamically generated matrix in JSON
