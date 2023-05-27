@@ -6,7 +6,7 @@ on:
         description: List of base images, split by anything
         required: false
         type: string
-      platforms:
+      platform:
         description: List of platforms, split by anything
         required: false
         type: string
