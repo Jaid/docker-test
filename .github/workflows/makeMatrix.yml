@@ -36,7 +36,6 @@ on:
         default: '{}'
 jobs:
   job:
-    name: ${{ github.event_name }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -61,6 +60,9 @@ jobs:
           import { matches, firstMatch } from "super-regex";
           import { VM } from "vm2";
           const inputs = JSON.parse(process.env.inputs);
+
+          console.dir(inputs)
+          console.dir(process)
 
           const matchAll = (regex, string) => {
             return Array.from(
