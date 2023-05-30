@@ -8,6 +8,9 @@ on:
 jobs:
   job:
     uses: ./.github/workflows/.pushDocker.yml
+    permissions:
+      contents: read
+      packages: write
     with:
       dockerHubUser: jaidchen
     secrets:
