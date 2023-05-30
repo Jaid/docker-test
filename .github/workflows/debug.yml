@@ -7,11 +7,3 @@ on:
 jobs:
   job:
     uses: jaid/workflows/.github/workflows/debug.yml@main
-  a:
-    name: Matrix
-    uses: jaid/docker-test/.github/workflows/makeMatrix.yml@main
-    with:
-      bases: ubuntu:rolling ubuntu:latest debian:stable-slim
-      platform: linux/amd64 linux/arm64/v8
-      additionEvals: |
-        pythonPackageVersion: base.startsWith('debian') ? '3.9' : '3.11'
