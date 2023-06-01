@@ -144,7 +144,7 @@ jobs:
     uses: jaid/workflows/.github/workflows/makeDockerTagMatrix.yml@main
     with:
       bases: ${{ inputs.matrixBases }}
-      platform: ${{ inputs.matrixPlatform || null }}
+      platform: ${{ inputs.matrixPlatform }}
       additionEvals: ${{ inputs.matrixAdditionEvals }}
       idEval: ${{ inputs.matrixIdEval }}
   test:
