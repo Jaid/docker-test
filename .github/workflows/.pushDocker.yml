@@ -168,7 +168,10 @@ jobs:
       imageArtifact: ${{ matrix.id }}.tar
       arch: ${{ matrix.platform }}
   job:
-    needs: getDockerImageName
+    needs:
+      - getDockerImageName
+      - makeMatrix
+      - test
     name: ${{ github.event_name }}${{ inputs.flavorSuffix && ' ' || '' }}${{ inputs.flavorSuffix }}
     runs-on: ubuntu-latest
     permissions:
