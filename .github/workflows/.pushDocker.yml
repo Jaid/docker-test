@@ -219,7 +219,15 @@ jobs:
       matrix:
         include: ${{ fromJson(needs.getTestInputs.outputs.output) }}
     uses: jaid/workflows/.github/workflows/testDocker.yml@main
-    with: ${{ matrix }}
+    with:
+      arch: ${{ matrix.arch }}
+      buildContext: ${{ matrix.buildContext }}
+      buildArgs: ${{ matrix.buildArgs }}
+      dockerRunArgs: ${{ matrix.dockerRunArgs }}
+      appArgs: ${{ matrix.appArgs }}
+      testEval: ${{ matrix.testEval }}
+      imageFile: ${{ matrix.imageFile }}
+      imageArtifact: ${{ matrix.imageArtifact }}
   job:
     needs:
       - getDockerImageName
