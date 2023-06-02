@@ -116,7 +116,7 @@ on:
         description: List of additional values, javascript object code without outer braces
         required: false
         type: string
-      matrixIdEval:
+      matrixflavorEval:
         description: Javascript code to generate the id
         required: false
         type: string
@@ -148,7 +148,7 @@ jobs:
       bases: ${{ inputs.matrixBases }}
       platform: ${{ inputs.matrixPlatform }}
       additionEvals: ${{ inputs.matrixAdditionEvals }}
-      idEval: ${{ inputs.matrixIdEval }}
+      flavorEval: ${{ inputs.matrixflavorEval }}
   test:
     name: test${{ matrix.id && format(' ({0})', matrix.id) }}
     needs:
