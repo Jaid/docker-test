@@ -147,6 +147,58 @@ jobs:
       platform: ${{ inputs.matrixPlatform }}
       additionEvals: ${{ inputs.matrixAdditionEvals }}
       idEval: ${{ inputs.matrixIdEval }}
+  getTestInputs:
+    name: getTestInputs
+    needs:
+      - makeMatrix
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.makeMatrix.outputs.output) }}
+    steps:
+      - name: setupNode
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: current
+      - name: installNodePackages
+        shell: bash
+        run: |
+          cd ..
+          npm install --no-package-lock --no-save @actions/core
+      - id: makeOutput
+        shell: sh -c "node --input-type module < {0}"
+        env:
+          inputs: ${{ toJSON(inputs) }}
+          matrixEntry: ${{ toJSON(matrix) }}
+        run: |
+          import core from '@actions/core'
+          const inputs = JSON.parse(process.env.inputs)
+          const output = {}
+          const fromInputsMapping = {
+            dockerRunArgs: 'testDockerRunArgs',
+            appArgs: 'testAppArgs',
+            testEval: 'testEval',
+            buildContext: 'testBuildContext',
+            imageArtifact: 'imageArtifact',
+          }
+          const fromMatrixMapping = {
+            arch: 'platform',
+          }
+          console.dir('From inputs mapping: ', fromInputsMapping)
+          console.dir('From matrix mapping: ', fromMatrixMapping)
+          for (const [key, value] of Object.entries(fromInputsMapping)) {
+            if (inputs[value]) {
+              output[key] = inputs[value]
+            }
+          }
+          for (const [key, value] of Object.entries(fromMatrixMapping)) {
+            if (matrix[value]) {
+              output[key] = matrix[value]
+            }
+          }
+          console.dir('Output: ', output)
+          core.setOutput('output', JSON.stringify(output))
   test:
     name: test${{ matrix.id && format(' ({0})', matrix.id) }}
     needs:
