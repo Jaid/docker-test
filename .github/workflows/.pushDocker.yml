@@ -166,11 +166,11 @@ jobs:
         shell: sh -c "node --input-type module < {0}"
         env:
           inputs: ${{ toJSON(inputs) }}
-          matrix: ${{ fromJson(needs.makeMatrix.outputs.output) }}
+          matrix: ${{ toJSON(needs.makeMatrix.outputs.output) }}
         run: |
           import core from '@actions/core'
           const inputs = JSON.parse(process.env.inputs)
-          const matrix = JSON.parse(process.env.matrixEntry)
+          const matrix = JSON.parse(process.env.matrix)
           const output = {}
           const fromInputsMapping = {
             dockerRunArgs: 'testDockerRunArgs',
