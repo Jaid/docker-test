@@ -215,7 +215,7 @@ jobs:
       matrix:
         include: ${{ fromJson(needs.getTestInputs.outputs.output) }}
     uses: jaid/workflows/.github/workflows/testDocker.yml@main
-    # with: ${{ fromJson(matrix) }}
+    with: ${{ matrix }}
   job:
     needs:
       - getDockerImageName
