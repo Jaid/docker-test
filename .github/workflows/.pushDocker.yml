@@ -101,6 +101,7 @@ on:
       testBuildContext:
         type: string
         required: false
+        default: src
       # makeDockerTagMatrix
       matrixBases:
         description: List of base images, split by anything
