@@ -166,6 +166,7 @@ jobs:
       testEval: ${{ inputs.testEval }}
       imageFile: /home/runner/work/_temp/${{matrix.id}}.tar
       imageArtifact: ${{ matrix.id }}
+      jobName: test${{ matrix.id && format(' ({0})', matrix.id) }}
   job:
     needs:
       - getDockerImageName
