@@ -204,26 +204,19 @@ jobs:
           }
           console.dir({output})
           core.setOutput('output', JSON.stringify(output))
+    outputs:
+      output: ${{ steps.makeOutput.outputs.output }}
   test:
     name: test${{ matrix.id && format(' ({0})', matrix.id) }}
     needs:
-      - makeMatrix
+      - getTestInputs
     if: ${{ inputs.testEval }}
     strategy:
       fail-fast: false
       matrix:
-        include: ${{ fromJson(needs.makeMatrix.outputs.output) }}
+        include: ${{ fromJson(needs.getTestInputs.outputs.output) }}
     uses: jaid/workflows/.github/workflows/testDocker.yml@main
-    with:
-      buildArgs: |
-        ${{ matrix.buildArgs }}
-        ${{ inputs.testBuildArgs }}
-      dockerRunArgs: ${{ inputs.testDockerRunArgs }}
-      appArgs: ${{ inputs.testAppArgs }}
-      testEval: ${{ inputs.testEval }}
-      buildContext: ${{ inputs.testBuildContext }}
-      imageArtifact: ${{ matrix.id }}.tar
-      arch: ${{ matrix.platform }}
+    # with: ${{ fromJson(matrix) }}
   job:
     needs:
       - getDockerImageName
