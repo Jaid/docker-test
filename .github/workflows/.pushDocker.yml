@@ -147,87 +147,24 @@ jobs:
       platform: ${{ inputs.matrixPlatform }}
       additionEvals: ${{ inputs.matrixAdditionEvals }}
       idEval: ${{ inputs.matrixIdEval }}
-  getTestInputs:
-    name: getTestInputs
-    needs:
-      - makeMatrix
-    runs-on: ubuntu-latest
-    steps:
-      - name: setupNode
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: current
-      - name: installNodePackages
-        shell: bash
-        run: |
-          cd ..
-          npm install --no-package-lock --no-save @actions/core
-      - id: makeOutput
-        shell: sh -c "node --input-type module < {0}"
-        env:
-          inputs: ${{ toJSON(inputs) }}
-          matrix: ${{ needs.makeMatrix.outputs.output }}
-        run: |
-          import core from '@actions/core'
-          const inputs = JSON.parse(process.env.inputs)
-          const matrix = JSON.parse(process.env.matrix)
-          const output = []
-          const fromInputsMapping = {
-            buildArgs: 'testBuildArgs',
-            dockerRunArgs: 'testDockerRunArgs',
-            appArgs: 'testAppArgs',
-            testEval: 'testEval',
-            buildContext: 'testBuildContext',
-            imageArtifact: 'imageArtifact',
-          }
-          const fromMatrixMapping = {
-            arch: 'platform',
-            id: 'id',
-            base: 'base',
-            addition: 'addition',
-          }
-          console.dir({
-            inputs,
-            matrix,
-            fromInputsMapping,
-            fromMatrixMapping,
-          })
-          for (const matrixEntry of matrix) {
-            const matrixEntry = {}
-            for (const [key, value] of Object.entries(fromInputsMapping)) {
-              if (inputs[value]) {
-                matrixEntry[key] = inputs[value]
-              }
-            }
-            for (const [key, value] of Object.entries(fromMatrixMapping)) {
-              if (matrix[value]) {
-                matrixEntry[key] = matrix[value]
-              }
-            }
-            output.push(matrixEntry)
-          }
-          console.dir({output})
-          core.setOutput('output', output)
-    outputs:
-      output: ${{ steps.makeOutput.outputs.output }}
   test:
     name: test${{ matrix.id && format(' ({0})', matrix.id) }}
     needs:
-      - getTestInputs
+      - makeMatrix
     strategy:
       fail-fast: false
       matrix:
-        include: ${{ fromJson(needs.getTestInputs.outputs.output) }}
+        include: ${{ fromJson(needs.makeMatrix.outputs.output) }}
     uses: jaid/workflows/.github/workflows/testDocker.yml@main
     with:
-      arch: ${{ matrix.arch }}
-      buildContext:
-      buildArgs: ${{ matrix.buildArgs }}
-      dockerRunArgs: ${{ matrix.dockerRunArgs }}
-      appArgs: ${{ matrix.appArgs }}
-      testEval: ${{ matrix.testEval }}
-      imageFile: ${{ matrix.imageFile }}
-      imageArtifact: ${{ matrix.imageArtifact }}
+      arch: ${{ matrix.platform }}
+      buildContext: ${{ inputs.testBuildContext }}
+      buildArgs: ${{ inputs.testBuildArgs }}
+      dockerRunArgs: ${{ inputs.testDockerRunArgs }}
+      appArgs: ${{ inputs.testAppArgs }}
+      testEval: ${{ inputs.testEval }}
+      imageFile: /home/runner/work/_temp/${{matrix.id}}.tar
+      imageArtifact: ${{ matrix.id }}
   job:
     needs:
       - getDockerImageName
