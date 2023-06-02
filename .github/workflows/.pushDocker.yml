@@ -173,6 +173,7 @@ jobs:
           const matrix = JSON.parse(process.env.matrix)
           const output = []
           const fromInputsMapping = {
+            buildArgs: 'testBuildArgs',
             dockerRunArgs: 'testDockerRunArgs',
             appArgs: 'testAppArgs',
             testEval: 'testEval',
