@@ -152,10 +152,6 @@ jobs:
     needs:
       - makeMatrix
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include: ${{ fromJson(needs.makeMatrix.outputs.output) }}
     steps:
       - name: setupNode
         uses: actions/setup-node@v3.6.0
@@ -170,7 +166,7 @@ jobs:
         shell: sh -c "node --input-type module < {0}"
         env:
           inputs: ${{ toJSON(inputs) }}
-          matrixEntry: ${{ toJSON(matrix) }}
+          matrix: ${{ fromJson(needs.makeMatrix.outputs.output) }}
         run: |
           import core from '@actions/core'
           const inputs = JSON.parse(process.env.inputs)
