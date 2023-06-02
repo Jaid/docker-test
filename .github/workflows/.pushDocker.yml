@@ -89,6 +89,7 @@ on:
       testEval:
         type: string
         required: false
+        default: status === 0
       testBuildArgs:
         type: string
         required: false
