@@ -186,8 +186,12 @@ jobs:
           const fromMatrixMapping = {
             arch: 'platform',
           }
-          console.dir('From inputs mapping: ', fromInputsMapping)
-          console.dir('From matrix mapping: ', fromMatrixMapping)
+          console.dir({
+            inputs,
+            matrix,
+            fromInputsMapping,
+            fromMatrixMapping,
+          })
           for (const [key, value] of Object.entries(fromInputsMapping)) {
             if (inputs[value]) {
               output[key] = inputs[value]
