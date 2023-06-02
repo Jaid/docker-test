@@ -203,7 +203,7 @@ jobs:
             output.push(matrixEntry)
           }
           console.dir({output})
-          core.setOutput('output', JSON.stringify(output))
+          core.setOutput('output', output)
     outputs:
       output: ${{ steps.makeOutput.outputs.output }}
   test:
