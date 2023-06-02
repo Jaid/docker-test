@@ -181,6 +181,9 @@ jobs:
           }
           const fromMatrixMapping = {
             arch: 'platform',
+            id: 'id',
+            base: 'base',
+            addition: 'addition',
           }
           console.dir({
             inputs,
