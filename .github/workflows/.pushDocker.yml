@@ -376,6 +376,7 @@ jobs:
         uses: actions/download-artifact@v3.0.2
         with:
           name: ${{ matrix.id }}
+          path: /home/runner/work/_temp/testImage.tar
       - name: loadTestImage
         run: |
           docker load --input /home/runner/work/_temp/testImage.tar
