@@ -165,7 +165,8 @@ jobs:
       dockerRunArgs: ${{ inputs.testDockerRunArgs }}
       appArgs: ${{ inputs.testAppArgs }}
       testEval: ${{ inputs.testEval }}
-      imageArtifact: ${{ matrix.id }}
+      imageArtifact: ${{ github.run_id }}-${{ matrix.id }}
+      imageFile: /home/runner/work/_temp/${{ github.run_id }}/image.tar
       jobName: test${{ matrix.id && format(' ({0})', matrix.id) }}
   job:
     needs:
@@ -375,11 +376,11 @@ jobs:
       - name: downloadTestImage
         uses: actions/download-artifact@v3.0.2
         with:
-          name: ${{ matrix.id }}
-          path: /home/runner/work/_temp/testImage.tar
+          name: ${{ github.run_id }}-${{ matrix.id }}
+          path: /home/runner/work/_temp/${{ github.run_id }}
       - name: loadTestImage
         run: |
-          docker load --input /home/runner/work/_temp/testImage.tar
+          docker load --input /home/runner/work/_temp/${{ github.run_id }}/image.tar
       - name: dockerPush
         id: dockerPush
         uses: docker/build-push-action@v4.0.0
