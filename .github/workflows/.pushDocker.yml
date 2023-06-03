@@ -165,7 +165,6 @@ jobs:
       dockerRunArgs: ${{ inputs.testDockerRunArgs }}
       appArgs: ${{ inputs.testAppArgs }}
       testEval: ${{ inputs.testEval }}
-      imageFile: /home/runner/work/_temp/${{matrix.id}}.tar
       imageArtifact: ${{ matrix.id }}
       jobName: test${{ matrix.id && format(' ({0})', matrix.id) }}
   job:
@@ -178,6 +177,9 @@ jobs:
     permissions:
       packages: write
       contents: read
+    strategy:
+      matrix:
+        include: ${{ fromJson(needs.makeMatrix.outputs.output) }}
     outputs:
       meta: ${{ steps.dockerPush.outputs.metadata }}
       digest: ${{ steps.dockerPush.outputs.digest }}
@@ -370,15 +372,21 @@ jobs:
             latest=${{ inputs.flavorLatest }}
             prefix=${{ inputs.flavorPrefix && format('{0}{1}', inputs.flavorPrefix, inputs.flavorConnectionString) || '' }}
             suffix=${{ inputs.flavorSuffix && format('{0}{1}', inputs.flavorConnectionString, inputs.flavorSuffix) || '' }}
+      - name: downloadTestImage
+        uses: actions/download-artifact@v3.0.2
+        with:
+          name: ${{ matrix.id }}
+      - name: loadTestImage
+        run: |
+          docker load --input /home/runner/work/_temp/testImage.tar
       - name: dockerPush
         id: dockerPush
         uses: docker/build-push-action@v4.0.0
         with:
           context: ${{ inputs.buildContext }}
-          platforms: ${{ steps.getArch.outputs.arch }}
+          platforms: ${{ matrix.platform }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: ${{ inputs.buildArgs }}
           cache-from: ${{ steps.getCacheInstruction.outputs.cacheFrom }}
           cache-to: ${{ steps.getCacheInstruction.outputs.cacheTo }}
           push: true
