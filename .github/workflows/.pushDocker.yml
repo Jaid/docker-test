@@ -126,15 +126,17 @@ on:
         description: 'Create here with “Read, Write”: https://hub.docker.com/settings/security?generateToken=true'
     outputs:
       meta:
-        value: ${{ jobs.job.outputs.meta }}
+        value: ${{ jobs.push.outputs.meta }}
       digest:
-        value: ${{ jobs.job.outputs.digest }}
+        value: ${{ jobs.push.outputs.digest }}
       imageId:
-        value: ${{ jobs.job.outputs.imageId }}
+        value: ${{ jobs.push.outputs.imageId }}
       imageName:
-        value: ${{ jobs.job.outputs.imageName }}
+        value: ${{ jobs.push.outputs.imageName }}
       imageSlug:
-        value: ${{ jobs.job.outputs.imageSlug }}
+        value: ${{ jobs.push.outputs.imageSlug }}
+      imageUser:
+        value: ${{ jobs.push.outputs.imageUser }}
 jobs:
   getDockerImageName:
     name: getDockerImageName
@@ -388,8 +390,8 @@ jobs:
           platforms: ${{ matrix.platform }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: ${{ steps.getCacheInstruction.outputs.cacheFrom }}
-          cache-to: ${{ steps.getCacheInstruction.outputs.cacheTo }}
+          cache-to: ${{ needs.test.outputs.cacheTo }}
+          cache-from: ${{ needs.test.outputs.cacheFrom }}
           push: true
       - name: dockerSyncReadme
         if: ${{ steps.getDockerHubTokenLength.outputs.length > 0 && inputs.readmePath }}
