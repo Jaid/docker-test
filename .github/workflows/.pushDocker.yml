@@ -159,7 +159,7 @@ jobs:
       fail-fast: false
       matrix:
         include: ${{ fromJson(needs.makeMatrix.outputs.output) }}
-    uses: jaid/workflows/.github/workflows/testDocker.yml@main
+    uses: ./.github/workflows/.testDocker.yml
     with:
       arch: ${{ matrix.platform }}
       buildContext: ${{ inputs.testBuildContext }}
@@ -174,7 +174,7 @@ jobs:
       - getDockerImageName
       - makeMatrix
       - test
-    name: ${{ github.event_name }}${{ inputs.flavorSuffix && ' ' || '' }}${{ inputs.flavorSuffix }}
+    name: push${{ matrix.id && format(' ({0})', matrix.id) }}
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -241,13 +241,19 @@ jobs:
           import { context } from '@actions/github'
           const inputs = JSON.parse(process.env.inputs)
           const refs = []
-          refs.push(`${inputs.githubRegistry}/${context.payload.repository.full_name.toLowerCase()}`)
+          const githubRef = `${inputs.githubRegistry}/${context.payload.repository.full_name.toLowerCase()}`
+          console.dir({githubRef})
+          core.setOutput('githubRef', githubRef)
+          refs.push(githubRef)
           if (process.env.getDockerHubTokenLength > 0) {
-            refs.push(process.env.dockerHubRef)
+            const dockerHubRef = `${inputs.dockerHubRegistry}/${process.env.dockerHubRef}`
+            console.dir({dockerHubRef})
+            core.setOutput('dockerHubRef', dockerHubRef)
+            refs.push(dockerHubRef)
           }
           const output = refs.join('\n')
-          console.dir(output)
-          core.setOutput('imageRefs', output)
+          console.dir({output})
+          core.setOutput('value', output)
       - name: getArch
         id: getArch
         shell: sh -c "node --input-type module < {0}"
@@ -382,6 +388,8 @@ jobs:
       - name: loadTestImage
         run: |
           docker load --input ${{ needs.test.outputs.imagePath }}
+      - id: debug
+        run: docker image ls
       - name: dockerPush
         id: dockerPush
         uses: docker/build-push-action@v4.0.0
@@ -391,7 +399,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-to: ${{ needs.test.outputs.cacheTo }}
-          cache-from: ${{ needs.test.outputs.cacheFrom }}
+          cache-from: type=registry,ref=${{ steps.getDockerImageName.outputs.imageSlug }}
           push: true
       - name: dockerSyncReadme
         if: ${{ steps.getDockerHubTokenLength.outputs.length > 0 && inputs.readmePath }}
