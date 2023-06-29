@@ -114,49 +114,6 @@ jobs:
           cache-to: ${{ inputs.cacheTo }}
           cache-from: ${{ inputs.cacheFrom }}
           tags: test
-      - id: runImage
-        if: ${{ inputs.arch == 'linux/amd64' }}
-        shell: sh -c "node --input-type module < {0}"
-        env:
-          inputs: ${{ toJSON(inputs) }}
-          imagePath: ${{ steps.getImagePath.outputs.imagePath }}
-        run: |
-          import core from '@actions/core'
-          import { execa } from 'execa'
-          import { VM } from 'vm2'
-          import fs from 'fs-extra'
-          import path from 'path'
-          const inputs = JSON.parse(process.env.inputs)
-          await execa('docker', ['load', '--input', process.env.imagePath], {all: true, verbose: true, stdio: 'inherit'})
-          const args = ['run', '--rm']
-          if (inputs.dockerRunArgs) {
-            args.push(...inputs.dockerRunArgs.split(' '))
-          }
-          args.push('test')
-          if (inputs.appArgs) {
-            args.push(...inputs.appArgs.split(' '))
-          }
-          const executionResult = await execa('docker', args, {all: true, verbose: true})
-          const sandboxGlobals = {
-            stdout: executionResult.stdout,
-            stderr: executionResult.stderr,
-            status: executionResult.exitCode,
-            fs,
-            executionResult,
-            inputs
-          }
-          console.dir(sandboxGlobals)
-          if (inputs.testEval) {
-            console.log(`Running validation expression: ${inputs.testEval}`)
-            const vm = new VM({
-              sandbox: sandboxGlobals
-            })
-            const validation = vm.run(inputs.testEval)
-            console.log(`Validation expression returned: ${validation}`)
-            if (!validation) {
-              throw new Error('Validation expression returned ' + validation)
-            }
-          }
       - name: getArtifactName
         id: getArtifactName
         shell: sh -c "node --input-type module < {0}"
