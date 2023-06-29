@@ -67,7 +67,7 @@ jobs:
     outputs:
       meta: ${{ steps.buildImage.outputs.metadata }}
       imageArtifact: ${{ steps.getArtifactName.outputs.value }}
-      imagePath: ${{ steps.getImagePath.outputs.imagePath }}
+      imagePath: ${{ steps.getImagePath.outputs.value }}
     steps:
       - name: checkout
         uses: actions/checkout@v3.5.2
@@ -110,7 +110,7 @@ jobs:
           context: ${{ inputs.buildContext }}
           platforms: ${{ inputs.arch }}
           build-args: ${{ inputs.buildArgs }}
-          outputs: type=docker,dest=${{ steps.getImagePath.outputs.imagePath }}
+          outputs: type=docker,dest=${{ steps.getImagePath.outputs.value }}
           cache-to: ${{ inputs.cacheTo }}
           cache-from: ${{ inputs.cacheFrom }}
           tags: test
