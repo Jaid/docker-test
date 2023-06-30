@@ -139,3 +139,15 @@ jobs:
           imageFolder: ${{ inputs.imageFolder }}
         run: |
           ls -l --almost-all --human-readable "$imageFolder"
+      - id: getOutputs
+        shell: sh -c "node --input-type module < {0}"
+        env:
+          steps: ${{ toJSON(steps) }}
+        run: |
+          import core from '@actions/core'
+          const steps = JSON.parse(process.env.steps)
+          const setOutput = (value, name = 'value') => {
+            core.setOutput(name, value)
+            console.dir('Output', {name, value})
+          }
+          console.dir({steps})
