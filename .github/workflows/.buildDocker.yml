@@ -13,12 +13,10 @@ on:
       buildArgs:
         type: string
         required: false
-        default: ''
       imageFolder:
         type: string
         required: false
         description: Folder to save the build to
-        default: /tmp/dockerBuild/${{ github.run_id }}_${{ inputs.id }}
       imageFile:
         type: string
         required: false
@@ -28,47 +26,34 @@ on:
         type: string
         required: false
         description: Name of the image artifact to save the build to
-        default: ${{ github.run_id }}_${{ inputs.id }}
       cacheTo:
         type: string
         required: false
         description: Cache key to save the build to
-        default: type=gha,scope=${{ inputs.cacheKey }},mode=max
       cacheFrom:
         type: string
         required: false
         description: Cache key to load the build from
-        default: type=gha,scope=${{ inputs.cacheKey }}
       cacheKey:
         type: string
         required: false
         description: Cache key to seperate unrelated caches
-        default: '${{ github.repository }}|${{ github.workflow }}|${{ github.ref_name }}|${{ inputs.id }}'
       jobName:
         type: string
         required: false
         description: Name of the job to run
-        default: ${{ github.workflow }}${{ inputs.id != 'default' && format(' ({0})', inputs.id)}}
+        default: ${{ github.workflow }}${{ inputs.id && inputs.id != 'default' && format(' ({0})', inputs.id)}}
       id:
         type: string
         required: false
         description: ID of the image
-        default: ${{ inputs.id || 'default' }}
     outputs:
-      imagePath:
-        value: ${{ jobs.build.outputs.imagePath }}
-      imageArtifact:
-        value: ${{ jobs.build.outputs.imageArtifact }}
+      inputs:
+        value: ${{ jobs.build.outputs.inputs }}
       meta:
         value: ${{ jobs.build.outputs.meta }}
-      cacheTo:
-        value: ${{ jobs.build.outputs.cacheTo }}
-      cacheFrom:
-        value: ${{ jobs.build.outputs.cacheFrom }}
-      cacheKey:
-        value: ${{ jobs.build.outputs.cacheKey }}
-      id:
-        value: ${{ jobs.build.outputs.id }}
+      imagePath:
+        value: ${{ jobs.build.outputs.imagePath }}
 jobs:
   build:
     name: ${{ inputs.jobName }}
@@ -76,13 +61,9 @@ jobs:
     permissions:
       contents: read
     outputs:
-      imagePath: ${{ steps.getOutputs.outputs.imagePath }}
-      imageArtifact: ${{ steps.getOutputs.outputs.imageArtifact }}
-      meta: ${{ steps.getOutputs.outputs.meta }}
-      cacheTo: ${{ steps.getOutputs.outputs.cacheTo }}
-      cacheFrom: ${{ steps.getOutputs.outputs.cacheFrom }}
-      cacheKey: ${{ steps.getOutputs.outputs.cacheKey }}
-      id: ${{ steps.getOutputs.outputs.id }}
+      inputs: ${{ steps.getInputs.outputs.value }}
+      meta: ${{ steps.buildImage.outputs.metadata }}
+      imagePath: ${{ steps.getImagePath.outputs.value }}
     steps:
       - name: checkout
         uses: actions/checkout@v3.5.2
@@ -95,6 +76,44 @@ jobs:
         run: |
           cd ..
           npm install --no-package-lock --no-save @actions/core read-file-string execa vm2 fs-extra
+      - id: getInputs
+        shell: sh -c "node --input-type module < {0}"
+        env:
+          inputs: ${{ toJSON(inputs) }}
+          github: ${{ toJSON(github) }}
+        run: |
+          import core from '@actions/core'
+          const inputs = JSON.parse(process.env.inputs)
+          const github = JSON.parse(process.env.github)
+          const setOutput = (value, name = 'value') => {
+            core.setOutput(name, value)
+            core.info(`Output ${name}: ${value}`)
+          }
+          const outputs = {
+            ...inputs
+          }
+          if (!outputs.id) {
+            outputs.id = 'default'
+          }
+          if (!outputs.cacheKey) {
+            outputs.cacheKey = `${github.repository}|${github.workflow}|${github.ref_name}|${outputs.id}`
+          }
+          if (!outputs.cacheFrom) {
+            outputs.cacheFrom = `type=gha,scope=${outputs.cacheKey}`
+          }
+          if (!outputs.cacheTo) {
+            outputs.cacheTo = `type=gha,scope=${outputs.cacheKey},mode=max`
+          }
+          if (!outputs.imageArtifact) {
+            outputs.imageArtifact = `${github.run_id}_${outputs.id}`
+          }
+          if (!outputs.imageFolder) {
+            outputs.imageFolder = `/tmp/dockerBuild/${github.run_id}_${outputs.id}`
+          }
+          for (const [key, value] of Object.entries(outputs)) {
+            setOutput(value, key)
+          }
+          setOutput(JSON.stringify(outputs))
       - name: setupQemu
         if: ${{ inputs.arch != 'linux/amd64' }}
         uses: docker/setup-qemu-action@v2.1.0
@@ -107,7 +126,7 @@ jobs:
       - id: getImagePath
         shell: sh -c "node --input-type module < {0}"
         env:
-          inputs: ${{ toJSON(inputs) }}
+          inputs: ${{ steps.getInputs.outputs.value }}
         run: |
           import core from '@actions/core'
           import path from 'path'
@@ -126,38 +145,18 @@ jobs:
           platforms: ${{ inputs.arch }}
           build-args: ${{ inputs.buildArgs }}
           outputs: type=docker,dest=${{ steps.getImagePath.outputs.value }}
-          cache-to: ${{ inputs.cacheTo }}
-          cache-from: ${{ inputs.cacheFrom }}
+          cache-to: ${{ steps.getInputs.outputs.cacheTo }}
+          cache-from: ${{ steps.getInputs.outputs.cacheFrom }}
           tags: test
       - name: saveArtifact
-        if: ${{ inputs.imageArtifact }}
+        if: ${{ steps.getInputs.outputs.imageArtifact }}
         uses: actions/upload-artifact@v3.1.2
         with:
-          name: ${{ inputs.imageArtifact }}
-          path: ${{ inputs.imageFolder }}
+          name: ${{ steps.getInputs.outputs.imageArtifact }}
+          path: ${{ steps.getInputs.outputs.imageFolder }}
       - id: checkArtifact
         shell: bash
         env:
-          imageFolder: ${{ inputs.imageFolder }}
+          imageFolder: ${{ steps.getInputs.outputs.imageFolder }}
         run: |
           ls -l --almost-all --block-size 1 "$imageFolder"
-      - id: getOutputs
-        shell: sh -c "node --input-type module < {0}"
-        env:
-          inputs: ${{ toJSON(inputs) }}
-          steps: ${{ toJSON(steps) }}
-        run: |
-          import core from '@actions/core'
-          const inputs = JSON.parse(process.env.inputs)
-          const steps = JSON.parse(process.env.steps)
-          const setOutput = (value, name = 'value') => {
-            core.setOutput(name, value)
-            core.info(`Output ${name}: ${value}`)
-          }
-          setOutput(steps.getImagePath.outputs.value, 'imagePath')
-          setOutput(inputs.imageArtifact, 'imageArtifact')
-          setOutput(steps.buildImage.outputs.metadata, 'meta')
-          setOutput(inputs.cacheFrom, 'cacheFrom')
-          setOutput(inputs.cacheTo, 'cacheTo')
-          setOutput(inputs.cacheKey, 'cacheKey')
-          setOutput(inputs.id, 'id')
