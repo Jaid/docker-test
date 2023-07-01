@@ -152,7 +152,7 @@ jobs:
           const steps = JSON.parse(process.env.steps)
           const setOutput = (value, name = 'value') => {
             core.setOutput(name, value)
-            console.dir('Output', {name, value})
+            core.info(`Output ${name}: ${value}`)
           }
           setOutput(steps.getImagePath.outputs.value, 'imagePath')
           setOutput(inputs.imageArtifact, 'imageArtifact')
