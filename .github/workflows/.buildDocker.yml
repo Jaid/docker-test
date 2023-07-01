@@ -28,6 +28,7 @@ on:
         type: string
         required: false
         description: Name of the image artifact to save the build to
+        default: ${{ github.run_id }}_${{ inputs.id }}
       cacheTo:
         type: string
         required: false
@@ -128,24 +129,11 @@ jobs:
           cache-to: ${{ inputs.cacheTo }}
           cache-from: ${{ inputs.cacheFrom }}
           tags: test
-      - name: getArtifactName
-        id: getArtifactName
-        shell: sh -c "node --input-type module < {0}"
-        env:
-          inputs: ${{ toJSON(inputs) }}
-        run: |
-          import core from '@actions/core'
-          const inputs = JSON.parse(process.env.inputs)
-          if (inputs.imageArtifact) {
-            core.setOutput('value', inputs.imageArtifact)
-          } else {
-            core.setOutput('value', `${env.GITHUB_RUN_ID}-${inputs.platform}`)
-          }
       - name: saveArtifact
         if: ${{ inputs.imageArtifact }}
         uses: actions/upload-artifact@v3.1.2
         with:
-          name: ${{ steps.getArtifactName.outputs.value }}
+          name: ${{ inputs.imageArtifact }}
           path: ${{ inputs.imageFolder }}
       - id: checkArtifact
         shell: bash
@@ -167,7 +155,7 @@ jobs:
             console.dir('Output', {name, value})
           }
           setOutput(steps.getImagePath.outputs.value, 'imagePath')
-          setOutput(steps.getArtifactName.outputs.value, 'imageArtifact')
+          setOutput(inputs.imageArtifact, 'imageArtifact')
           setOutput(steps.buildImage.outputs.metadata, 'meta')
           setOutput(inputs.cacheFrom, 'cacheFrom')
           setOutput(inputs.cacheTo, 'cacheTo')
