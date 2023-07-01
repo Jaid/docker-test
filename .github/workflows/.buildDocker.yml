@@ -18,7 +18,7 @@ on:
         type: string
         required: false
         description: Folder to save the build to
-        default: /tmp/dockerTest/${{ github.run_id }}
+        default: /tmp/dockerTest/${{ github.run_id }}_${{ inputs.id }}
       imageFile:
         type: string
         required: false
@@ -32,42 +32,56 @@ on:
         type: string
         required: false
         description: Cache key to save the build to
-        default: type=inline,mode=max,compression=zstd,compression-level=19
+        default: type=gha,scope=${{ inputs.cacheKey }},mode=max
       cacheFrom:
         type: string
         required: false
         description: Cache key to load the build from
-        default: type=gha
+        default: type=gha,scope=${{ inputs.cacheKey }}
+      cacheKey:
+        type: string
+        required: false
+        description: Cache key to seperate unrelated caches
+        default: '${{ github.repository }}|${{ github.workflow }}|${{ github.ref_name }}|${{ inputs.id }}'
       jobName:
         type: string
         required: false
         description: Name of the job to run
-        default: ${{ format('{0} → {1}', github.event_name, 'build') }}
+        default: ${{ github.workflow }}${{ inputs.id != 'default' && format(' ({0})', inputs.id)}}
+      id:
+        type: string
+        required: false
+        description: ID of the image
+        default: default
     outputs:
-      meta:
-        value: ${{ jobs.test.outputs.meta }}
-      imageFolder:
-        value: ${{ inputs.imageFolder }}
-      imageFile:
-        value: ${{ inputs.imageFile }}
       imagePath:
-        value: ${{ jobs.test.outputs.imagePath }}
+        value: ${{ jobs.build.outputs.imagePath }}
       imageArtifact:
-        value: ${{ jobs.test.outputs.imageArtifact }}
+        value: ${{ jobs.build.outputs.imageArtifact }}
+      meta:
+        value: ${{ jobs.build.outputs.meta }}
       cacheTo:
-        value: ${{ inputs.cacheTo }}
+        value: ${{ jobs.build.outputs.cacheTo }}
       cacheFrom:
-        value: ${{ inputs.cacheFrom }}
+        value: ${{ jobs.build.outputs.cacheFrom }}
+      cacheKey:
+        value: ${{ jobs.build.outputs.cacheKey }}
+      id:
+        value: ${{ jobs.build.outputs.id }}
 jobs:
-  test:
+  build:
     name: ${{ inputs.jobName }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
     outputs:
-      meta: ${{ steps.buildImage.outputs.metadata }}
-      imageArtifact: ${{ steps.getArtifactName.outputs.value }}
-      imagePath: ${{ steps.getImagePath.outputs.value }}
+      imagePath: ${{ steps.getOutputs.outputs.imagePath }}
+      imageArtifact: ${{ steps.getOutputs.outputs.imageArtifact }}
+      meta: ${{ steps.getOutputs.outputs.meta }}
+      cacheTo: ${{ steps.getOutputs.outputs.cacheTo }}
+      cacheFrom: ${{ steps.getOutputs.outputs.cacheFrom }}
+      cacheKey: ${{ steps.getOutputs.outputs.cacheKey }}
+      id: ${{ steps.getOutputs.outputs.id }}
     steps:
       - name: checkout
         uses: actions/checkout@v3.5.2
@@ -138,16 +152,24 @@ jobs:
         env:
           imageFolder: ${{ inputs.imageFolder }}
         run: |
-          ls -l --almost-all --human-readable "$imageFolder"
+          ls -l --almost-all --block-size 1 "$imageFolder"
       - id: getOutputs
         shell: sh -c "node --input-type module < {0}"
         env:
+          inputs: ${{ toJSON(inputs) }}
           steps: ${{ toJSON(steps) }}
         run: |
           import core from '@actions/core'
+          const inputs = JSON.parse(process.env.inputs)
           const steps = JSON.parse(process.env.steps)
           const setOutput = (value, name = 'value') => {
             core.setOutput(name, value)
             console.dir('Output', {name, value})
           }
-          console.dir({steps})
+          setOutput(steps.getImagePath.outputs.value, 'imagePath')
+          setOutput(steps.getArtifactName.outputs.value, 'imageArtifact')
+          setOutput(steps.buildImage.outputs.metadata, 'meta')
+          setOutput(inputs.cacheFrom, 'cacheFrom')
+          setOutput(inputs.cacheTo, 'cacheTo')
+          setOutput(inputs.cacheKey, 'cacheKey')
+          setOutput(inputs.id, 'id')
