@@ -18,7 +18,7 @@ on:
         type: string
         required: false
         description: Folder to save the build to
-        default: /tmp/dockerTest/${{ github.run_id }}_${{ inputs.id }}
+        default: /tmp/dockerBuild/${{ github.run_id }}_${{ inputs.id }}
       imageFile:
         type: string
         required: false
@@ -53,7 +53,7 @@ on:
         type: string
         required: false
         description: ID of the image
-        default: default
+        default: ${{ inputs.id || 'default' }}
     outputs:
       imagePath:
         value: ${{ jobs.build.outputs.imagePath }}
