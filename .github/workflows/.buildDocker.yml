@@ -162,4 +162,4 @@ jobs:
         env:
           imageFolder: ${{ steps.getInputs.outputs.imageFolder }}
         run: |
-          ls -l --almost-all --block-size 1 "$imageFolder"
+          ls -l --almost-all --block-size 1 --color always "$imageFolder"
