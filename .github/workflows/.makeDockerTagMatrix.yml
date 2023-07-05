@@ -42,7 +42,7 @@ jobs:
         shell: bash
         run: |
           cd ..
-          npm install --no-package-lock --no-save @actions/core vm2 super-regex
+          npm install --no-package-lock --no-save @actions/core vm2 super-regex js-yaml
       - id: makeMatrix
         shell: sh -c "node --input-type module < {0}"
         env:
@@ -84,13 +84,14 @@ jobs:
           }
 
           const compareNativeArch = platform => {
-            if (process.env.arch === 'x64') {
+            const currentArch = process.env.arch.toLowerCase()
+            if (currentArch === 'x64') {
               return platform === 'linux/amd64'
             }
-            if (process.env.arch === 'arm64') {
+            if (currentArch === 'arm64') {
               return platform === 'linux/arm64/v8'
             }
-            if (process.env.arch === 'arm') {
+            if (currentArch === 'arm') {
               return platform === 'linux/arm/v7'
             }
             return false
