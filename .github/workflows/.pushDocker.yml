@@ -168,6 +168,7 @@ jobs:
   test:
     name: test${{ matrix.id && format(' ({0})', matrix.id) }}
     needs:
+      - makeMatrix
       - build
     strategy:
       matrix:

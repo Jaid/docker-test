@@ -47,6 +47,7 @@ jobs:
         shell: sh -c "node --input-type module < {0}"
         env:
           inputs: ${{ toJSON(inputs) }}
+          arch: ${{ runner.arch }}
         run: |
           import core from '@actions/core'
           import { matches, firstMatch } from 'super-regex'
@@ -82,6 +83,19 @@ jobs:
             return vm.run(code)
           }
 
+          const compareNativeArch = platform => {
+            if (process.env.arch === 'x64') {
+              return platform === 'linux/amd64'
+            }
+            if (process.env.arch === 'arm64') {
+              return platform === 'linux/arm64/v8'
+            }
+            if (process.env.arch === 'arm') {
+              return platform === 'linux/arm/v7'
+            }
+            return false
+          }
+
           const bases = inputs.bases
             ? matchAll(/(?<match>[\w-_:]+)/g, inputs.bases).map((match) => match.match)
             : ['']
@@ -102,7 +116,7 @@ jobs:
                 platform,
                 base,
               }
-              entry.isNativeArch = platform === 'linux/amd64'
+              entry.isNativeArch = compareNativeArch(entry.platform)
               if (additions) {
                 for (const addition of additions) {
                   const { key, code } = firstMatch(
