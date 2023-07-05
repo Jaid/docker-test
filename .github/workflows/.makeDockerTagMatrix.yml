@@ -166,4 +166,4 @@ jobs:
             lineWidth: -1,
             noRefs: true,
             noCompatMode: true
-          })
+          }))
