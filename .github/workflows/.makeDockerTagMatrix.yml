@@ -44,7 +44,7 @@ jobs:
           cd ..
           npm install --no-package-lock --no-save @actions/core vm2 super-regex js-yaml
       - id: makeMatrix
-        shell: sh -c 'node --input-type module < {0}'
+        shell: sh -c "node --input-type module < {0}"
         env:
           inputs: ${{ toJSON(inputs) }}
           arch: ${{ runner.arch }}
