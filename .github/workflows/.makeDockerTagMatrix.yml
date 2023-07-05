@@ -31,7 +31,7 @@ jobs:
     permissions:
       contents: read
     outputs:
-      output: ${{ steps.makeMatrix.outputs.output }}
+      output: ${{ steps.makeMatrix.outputs.value }}
       nativeArch: ${{ steps.makeMatrix.outputs.nativeArch }}
     steps:
       - name: setupNode
