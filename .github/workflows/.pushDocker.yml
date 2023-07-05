@@ -116,7 +116,7 @@ on:
         description: List of additional values, javascript object code without outer braces
         required: false
         type: string
-      matrixflavorEval:
+      matrixFlavorEval:
         description: Javascript code to generate the id
         required: false
         type: string
@@ -145,12 +145,12 @@ jobs:
       dockerHubUser: ${{ inputs.dockerHubUser }}
   makeMatrix:
     name: makeMatrix
-    uses: jaid/workflows/.github/workflows/makeDockerTagMatrix.yml@main
+    uses: ./.github/workflows/.makeDockerTagMatrix.yml
     with:
       bases: ${{ inputs.matrixBases }}
       platform: ${{ inputs.matrixPlatform }}
       additionEvals: ${{ inputs.matrixAdditionEvals }}
-      flavorEval: ${{ inputs.matrixflavorEval }}
+      flavorEval: ${{ inputs.matrixFlavorEval }}
   build:
     # name: build${{ matrix.id && format(' ({0})', matrix.id) }}
     needs:
@@ -165,24 +165,19 @@ jobs:
       buildContext: ${{ inputs.buildContext }}
       buildArgs: ${{ inputs.buildArgs }}
       id: ${{ matrix.id }}
-  # test:
-  #   name: test${{ matrix.id && format(' ({0})', matrix.id) }}
-  #   needs:
-  #     - makeMatrix
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       include: ${{ fromJson(needs.makeMatrix.outputs.output) }}
-  #   uses: ./.github/workflows/.testDocker.yml
-  #   with:
-  #     arch: ${{ matrix.platform }}
-  #     buildContext: ${{ inputs.testBuildContext }}
-  #     buildArgs: ${{ inputs.testBuildArgs }}
-  #     dockerRunArgs: ${{ inputs.testDockerRunArgs }}
-  #     appArgs: ${{ inputs.testAppArgs }}
-  #     testEval: ${{ inputs.testEval }}
-  #     imageArtifact: ${{ github.run_id }}-${{ matrix.id }}
-  #     jobName: test${{ matrix.id && format(' ({0})', matrix.id) }}
+  test:
+    name: test${{ matrix.id && format(' ({0})', matrix.id) }}
+    needs:
+      - build
+    strategy:
+      matrix:
+        include: ${{ fromJson(needs.makeMatrix.outputs.nativeArch) }}
+    uses: ./.github/workflows/.testDocker.yml
+    with:
+      dockerRunArgs: ${{ inputs.testDockerRunArgs }}
+      appArgs: ${{ inputs.testAppArgs }}
+      testEval: ${{ inputs.testEval }}
+      id: ${{ matrix.id }}
   # push:
   #   needs:
   #     - getDockerImageName
