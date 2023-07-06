@@ -6,4 +6,4 @@ on:
       - main
 jobs:
   job:
-    uses: ./.github/workflows/overlay/debug.yml
+    uses: ./.github/workflows/debug.overlay.yml

@@ -7,7 +7,7 @@ on:
     - cron: 45 23 * * 0 # https://crontab.guru/#45_23_*_*_0
 jobs:
   job:
-    uses: ./.github/workflows/overlay/pushDocker.yml
+    uses: ./.github/workflows/pushDocker.overlay.yml
     permissions:
       contents: read
       packages: write
