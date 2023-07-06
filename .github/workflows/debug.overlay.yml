@@ -24,60 +24,71 @@ jobs:
       - name: users
         shell: bash
         run: |
+          set -o xtrace
           cat /etc/passwd
       - name: groups
         shell: bash
         run: |
+          set -o xtrace
           cat /etc/group
       - name: whoami
         shell: bash
         run: |
+          set -o xtrace
           whoami
       - name: myGroups
         shell: bash
         run: |
+          set -o xtrace
           groups
       - name: dumpStrategy
         shell: bash
         env:
           object: ${{ toJson(strategy) }}
         run: |
+          set -o xtrace
           jq --indent 2 --color-output . <<< "$object"
       - name: dumpEnv
         shell: bash
         env:
           object: ${{ toJson(env) }}
         run: |
+          set -o xtrace
           jq --indent 2 --color-output . <<< "$object"
       - name: dumpVars
         shell: bash
         env:
           object: ${{ toJson(vars) }}
         run: |
+          set -o xtrace
           jq --indent 2 --color-output . <<< "$object"
       - name: dumpGithub
         shell: bash
         env:
           object: ${{ toJson(github) }}
         run: |
+          set -o xtrace
           jq --indent 2 --color-output . <<< "$object"
       - name: dumpJob
         shell: bash
         env:
           object: ${{ toJson(job) }}
         run: |
+          set -o xtrace
           jq --indent 2 --color-output . <<< "$object"
       - name: dumpSteps
         shell: bash
         env:
           object: ${{ toJson(steps) }}
         run: |
+          set -o xtrace
           jq --indent 2 --color-output . <<< "$object"
       - name: dumpRunner
         shell: bash
         env:
           object: ${{ toJson(runner) }}
         run: |
+          set -o xtrace
           jq --indent 2 --color-output . <<< "$object"
       - name: osRelease
         shell: bash
@@ -168,7 +179,7 @@ jobs:
           done
       - id: lsHome
         if: ${{ steps.prepare.outcome == 'success' && steps.prepare.outputs.homeFolder != '' }}
-        name: ls ${{ steps.prepare.outputs.homeFolder }}
+        name: 'ls homeFolder: ${{ steps.prepare.outputs.homeFolder }}'
         shell: bash
         env:
           target: ${{ steps.prepare.outputs.homeFolder }}
@@ -177,7 +188,7 @@ jobs:
           ls -l --almost-all --color=always --si --literal --group-directories-first "$target"
       - id: lsCwd
         if: ${{ steps.prepare.outcome == 'success' && steps.prepare.outputs.cwdFolder != '' }}
-        name: ls ${{ steps.prepare.outputs.cwdFolder }}
+        name: 'ls cwdFolder: ${{ steps.prepare.outputs.cwdFolder }}'
         shell: bash
         env:
           target: ${{ steps.prepare.outputs.cwdFolder }}
@@ -186,7 +197,7 @@ jobs:
           ls -l --almost-all --color=always --si --literal --group-directories-first "$target"
       - id: lsCwdParent
         if: ${{ steps.prepare.outcome == 'success' && steps.prepare.outputs.cwdParentFolder != '' }}
-        name: ls ${{ steps.prepare.outputs.cwdParentFolder }}
+        name: 'ls cwdParentFolder: ${{ steps.prepare.outputs.cwdParentFolder }}'
         shell: bash
         env:
           target: ${{ steps.prepare.outputs.cwdParentFolder }}
@@ -195,7 +206,7 @@ jobs:
           ls -l --almost-all --color=always --si --literal --group-directories-first "$target"
       - id: lsWorkspace
         if: ${{ steps.prepare.outcome == 'success' && steps.prepare.outputs.workspaceFolder != '' }}
-        name: ls ${{ steps.prepare.outputs.workspaceFolder }}
+        name: 'ls workspaceFolder: ${{ steps.prepare.outputs.workspaceFolder }}'
         shell: bash
         env:
           target: ${{ steps.prepare.outputs.workspaceFolder }}
@@ -204,7 +215,7 @@ jobs:
           ls -l --almost-all --color=always --si --literal --group-directories-first "$target"
       - id: lsTemp
         if: ${{ steps.prepare.outcome == 'success' && steps.prepare.outputs.tempFolder != '' }}
-        name: ls ${{ steps.prepare.outputs.tempFolder }}
+        name: 'ls tempFolder: ${{ steps.prepare.outputs.tempFolder }}'
         shell: bash
         env:
           target: ${{ steps.prepare.outputs.tempFolder }}
