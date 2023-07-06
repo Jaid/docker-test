@@ -29,6 +29,14 @@ jobs:
         shell: bash
         run: |
           cat /etc/group
+      - name: whoami
+        shell: bash
+        run: |
+          whoami
+      - name: myGroups
+        shell: bash
+        run: |
+          groups
       - name: dumpStrategy
         shell: bash
         env:
