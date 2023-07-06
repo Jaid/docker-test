@@ -41,49 +41,49 @@ jobs:
         run: |
           set -o xtrace
           groups
-      - name: dumpStrategy
+      - name: dumpContext (strategy)
         shell: bash
         env:
           object: ${{ toJson(strategy) }}
         run: |
           set -o xtrace
           jq --indent 2 --color-output . <<< "$object"
-      - name: dumpEnv
+      - name: dumpContext (matrix)
         shell: bash
         env:
           object: ${{ toJson(env) }}
         run: |
           set -o xtrace
           jq --indent 2 --color-output . <<< "$object"
-      - name: dumpVars
+      - name: dumpContext (vars)
         shell: bash
         env:
           object: ${{ toJson(vars) }}
         run: |
           set -o xtrace
           jq --indent 2 --color-output . <<< "$object"
-      - name: dumpGithub
+      - name: dumpContext (github)
         shell: bash
         env:
           object: ${{ toJson(github) }}
         run: |
           set -o xtrace
           jq --indent 2 --color-output . <<< "$object"
-      - name: dumpJob
+      - name: dumpContext (job)
         shell: bash
         env:
           object: ${{ toJson(job) }}
         run: |
           set -o xtrace
           jq --indent 2 --color-output . <<< "$object"
-      - name: dumpSteps
+      - name: dumpContext (steps)
         shell: bash
         env:
           object: ${{ toJson(steps) }}
         run: |
           set -o xtrace
           jq --indent 2 --color-output . <<< "$object"
-      - name: dumpRunner
+      - name: dumpContext (runner)
         shell: bash
         env:
           object: ${{ toJson(runner) }}
