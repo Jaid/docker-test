@@ -198,7 +198,9 @@ jobs:
   #     - name: setupNode
   #       uses: actions/setup-node@v3.7.0
   #       with:
-  #         node-version: current
+  #         node-version: latest
+  #         cache: npm
+  #         cache-dependency-path: ../package-lock.json
   #     - name: installNodePackages
   #       shell: bash
   #       run: |
