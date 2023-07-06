@@ -3,6 +3,7 @@ on:
   workflow_call: {}
 jobs:
   job:
+    name: debug
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
@@ -179,13 +180,14 @@ jobs:
           done
       - id: lsHome
         if: ${{ steps.prepare.outcome == 'success' && steps.prepare.outputs.homeFolder != '' }}
-        name: 'ls homeFolder: ${{ steps.prepare.outputs.homeFolder }}'
+        name: '📂 ${{ steps.prepare.outputs.homeFolder }}'
         shell: bash
         env:
           target: ${{ steps.prepare.outputs.homeFolder }}
         working-directory: ${{ steps.prepare.outputs.homeFolder }}
         run: |
           set -o xtrace
+          du --apparent-size --summarize --bytes "$target"
           ls -l --almost-all --color=always --si --literal --group-directories-first
       - id: lsCwd
         if: ${{ steps.prepare.outcome == 'success' && steps.prepare.outputs.cwdFolder != '' }}
