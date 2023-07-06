@@ -200,12 +200,9 @@ jobs:
   #       with:
   #         node-version: latest
   #         cache: npm
-  #         cache-dependency-path: ../package-lock.json
   #     - name: installNodePackages
   #       shell: bash
-  #       run: |
-  #         cd ..
-  #         npm install @actions/core @actions/github read-file-string
+  #       run: npm install --global @actions/core @actions/github read-file-string
   #     - name: getDockerHubTokenLength
   #       id: getDockerHubTokenLength
   #       shell: sh -c "node --input-type module < {0}"

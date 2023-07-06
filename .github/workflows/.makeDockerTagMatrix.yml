@@ -39,12 +39,9 @@ jobs:
         with:
           node-version: latest
           cache: npm
-          cache-dependency-path: ../package-lock.json
       - name: installNodePackages
         shell: bash
-        run: |
-          cd ..
-          npm install @actions/core vm2 super-regex js-yaml
+        run: npm install --global @actions/core vm2 super-regex js-yaml
       - id: makeMatrix
         shell: sh -c "node --input-type module < {0}"
         env:
