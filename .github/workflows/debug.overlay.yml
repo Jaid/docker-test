@@ -183,6 +183,7 @@ jobs:
         name: '📂 ${{ steps.prepare.outputs.homeFolder }}'
         shell: bash
         env:
+          TERM: xterm-256color
           target: ${{ steps.prepare.outputs.homeFolder }}
         working-directory: ${{ steps.prepare.outputs.homeFolder }}
         run: |
@@ -191,41 +192,49 @@ jobs:
           ls -l --almost-all --color=always --si --literal --group-directories-first
       - id: lsCwd
         if: ${{ steps.prepare.outcome == 'success' && steps.prepare.outputs.cwdFolder != '' }}
-        name: 'ls cwdFolder: ${{ steps.prepare.outputs.cwdFolder }}'
+        name: '📂 ${{ steps.prepare.outputs.cwdFolder }}'
         shell: bash
         env:
+          TERM: xterm-256color
           target: ${{ steps.prepare.outputs.cwdFolder }}
         working-directory: ${{ steps.prepare.outputs.cwdFolder }}
         run: |
           set -o xtrace
+          du --apparent-size --summarize --bytes "$target"
           ls -l --almost-all --color=always --si --literal --group-directories-first
       - id: lsCwdParent
         if: ${{ steps.prepare.outcome == 'success' && steps.prepare.outputs.cwdParentFolder != '' }}
-        name: 'ls cwdParentFolder: ${{ steps.prepare.outputs.cwdParentFolder }}'
+        name: '📂 ${{ steps.prepare.outputs.cwdParentFolder }}'
         shell: bash
         env:
+          TERM: xterm-256color
           target: ${{ steps.prepare.outputs.cwdParentFolder }}
         working-directory: ${{ steps.prepare.outputs.cwdParentFolder }}
         run: |
           set -o xtrace
+          du --apparent-size --summarize --bytes "$target"
           ls -l --almost-all --color=always --si --literal --group-directories-first
       - id: lsWorkspace
         if: ${{ steps.prepare.outcome == 'success' && steps.prepare.outputs.workspaceFolder != '' }}
-        name: 'ls workspaceFolder: ${{ steps.prepare.outputs.workspaceFolder }}'
+        name: '📂 ${{ steps.prepare.outputs.workspaceFolder }}'
         shell: bash
         env:
+          TERM: xterm-256color
           target: ${{ steps.prepare.outputs.workspaceFolder }}
         working-directory: ${{ steps.prepare.outputs.workspaceFolder }}
         run: |
           set -o xtrace
-          ls -l --almost-all --color=always --si --literal --group-directories-first "$target"
+          du --apparent-size --summarize --bytes "$target"
+          ls -l --almost-all --color=always --si --literal --group-directories-first
       - id: lsTemp
         if: ${{ steps.prepare.outcome == 'success' && steps.prepare.outputs.tempFolder != '' }}
-        name: 'ls tempFolder: ${{ steps.prepare.outputs.tempFolder }}'
+        name: '📂 ${{ steps.prepare.outputs.tempFolder }}'
         shell: bash
-        working-directory: ${{ steps.prepare.outputs.tempFolder }}
         env:
+          TERM: xterm-256color
           target: ${{ steps.prepare.outputs.tempFolder }}
+        working-directory: ${{ steps.prepare.outputs.tempFolder }}
         run: |
           set -o xtrace
+          du --apparent-size --summarize --bytes "$target"
           ls -l --almost-all --color=always --si --literal --group-directories-first
