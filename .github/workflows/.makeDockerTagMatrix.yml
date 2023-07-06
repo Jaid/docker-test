@@ -35,14 +35,14 @@ jobs:
       nativeArch: ${{ steps.makeMatrix.outputs.nativeArch }}
     steps:
       - name: setupNode
-        uses: actions/setup-node@v3.6.0
+        uses: actions/setup-node@v3.7.0
         with:
           node-version: current
       - name: installNodePackages
         shell: bash
         run: |
           cd ..
-          npm install --no-package-lock --no-save @actions/core vm2 super-regex js-yaml
+          npm install @actions/core vm2 super-regex js-yaml
       - id: makeMatrix
         shell: sh -c "node --input-type module < {0}"
         env:

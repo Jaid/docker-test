@@ -42,16 +42,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v3.5.2
+        uses: actions/checkout@v3.5.3
       - name: setupNode
-        uses: actions/setup-node@v3.6.0
+        uses: actions/setup-node@v3.7.0
         with:
           node-version: current
       - name: installNodePackages
         shell: bash
         run: |
           cd ..
-          npm install --no-package-lock --no-save @actions/core read-file-string execa vm2 fs-extra
+          npm install @actions/core read-file-string execa vm2 fs-extra
       - id: getInputs
         shell: sh -c "node --input-type module < {0}"
         env:
