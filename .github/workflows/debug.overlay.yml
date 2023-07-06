@@ -183,33 +183,37 @@ jobs:
         shell: bash
         env:
           target: ${{ steps.prepare.outputs.homeFolder }}
+        working-directory: ${{ steps.prepare.outputs.homeFolder }}
         run: |
           set -o xtrace
-          ls -l --almost-all --color=always --si --literal --group-directories-first "$target"
+          ls -l --almost-all --color=always --si --literal --group-directories-first
       - id: lsCwd
         if: ${{ steps.prepare.outcome == 'success' && steps.prepare.outputs.cwdFolder != '' }}
         name: 'ls cwdFolder: ${{ steps.prepare.outputs.cwdFolder }}'
         shell: bash
         env:
           target: ${{ steps.prepare.outputs.cwdFolder }}
+        working-directory: ${{ steps.prepare.outputs.cwdFolder }}
         run: |
           set -o xtrace
-          ls -l --almost-all --color=always --si --literal --group-directories-first "$target"
+          ls -l --almost-all --color=always --si --literal --group-directories-first
       - id: lsCwdParent
         if: ${{ steps.prepare.outcome == 'success' && steps.prepare.outputs.cwdParentFolder != '' }}
         name: 'ls cwdParentFolder: ${{ steps.prepare.outputs.cwdParentFolder }}'
         shell: bash
         env:
           target: ${{ steps.prepare.outputs.cwdParentFolder }}
+        working-directory: ${{ steps.prepare.outputs.cwdParentFolder }}
         run: |
           set -o xtrace
-          ls -l --almost-all --color=always --si --literal --group-directories-first "$target"
+          ls -l --almost-all --color=always --si --literal --group-directories-first
       - id: lsWorkspace
         if: ${{ steps.prepare.outcome == 'success' && steps.prepare.outputs.workspaceFolder != '' }}
         name: 'ls workspaceFolder: ${{ steps.prepare.outputs.workspaceFolder }}'
         shell: bash
         env:
           target: ${{ steps.prepare.outputs.workspaceFolder }}
+        working-directory: ${{ steps.prepare.outputs.workspaceFolder }}
         run: |
           set -o xtrace
           ls -l --almost-all --color=always --si --literal --group-directories-first "$target"
@@ -217,8 +221,9 @@ jobs:
         if: ${{ steps.prepare.outcome == 'success' && steps.prepare.outputs.tempFolder != '' }}
         name: 'ls tempFolder: ${{ steps.prepare.outputs.tempFolder }}'
         shell: bash
+        working-directory: ${{ steps.prepare.outputs.tempFolder }}
         env:
           target: ${{ steps.prepare.outputs.tempFolder }}
         run: |
           set -o xtrace
-          ls -l --almost-all --color=always --si --literal --group-directories-first "$target"
+          ls -l --almost-all --color=always --si --literal --group-directories-first
