@@ -103,7 +103,7 @@ jobs:
             : ['']
           const platforms = inputs.platform
             ? matchAll(/(?<match>[a-z0-9/]+)/g, inputs.platform).map((match) => match.match)
-            : ['linux/amd64', 'linux/arm64/v8']
+            : ['linux/amd64']
           const additions = inputs.additionEvals
             ? inputs.additionEvals
                 .split('\n')
@@ -162,7 +162,6 @@ jobs:
 
           console.log('Matrix:')
           console.log(jsYaml.dump(matrix, {
-            sortKeys: true,
             lineWidth: -1,
             noRefs: true,
             noCompatMode: true

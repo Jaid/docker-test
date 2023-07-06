@@ -1,3 +1,4 @@
+name: abc
 on:
   workflow_call:
     inputs:

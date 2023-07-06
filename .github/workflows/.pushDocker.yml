@@ -85,25 +85,18 @@ on:
         type: string
         required: false
         default: ''
-      # testDocker
+      ### testDocker
       testEval:
         type: string
         required: false
         default: status === 0
-      # testBuildArgs:
-      #   type: string
-      #   required: false
       testDockerRunArgs:
         type: string
         required: false
       testAppArgs:
         type: string
         required: false
-      # testBuildContext:
-      #   type: string
-      #   required: false
-      #   default: src
-      # makeDockerTagMatrix
+      ### makeDockerTagMatrix
       matrixBases:
         description: List of base images, split by anything
         required: false
@@ -152,7 +145,7 @@ jobs:
       additionEvals: ${{ inputs.matrixAdditionEvals }}
       flavorEval: ${{ inputs.matrixFlavorEval }}
   build:
-    # name: build${{ matrix.id && format(' ({0})', matrix.id) }}
+    name: build${{ matrix.id && format(' ({0})', matrix.id) }}
     needs:
       - makeMatrix
     strategy:
