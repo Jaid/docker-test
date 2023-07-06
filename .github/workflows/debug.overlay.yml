@@ -6,6 +6,15 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
+      - name: prepare
+        id: prepare
+        shell: bash
+        run: |
+          printf 'homeFolder=%s\n' "$(realpath ~)" >> $GITHUB_OUTPUT
+          printf 'cwdFolder=%s\n' "$(realpath .)" >> $GITHUB_OUTPUT
+          printf 'cwdParentFolder=%s\n' "$(realpath ..)" >> $GITHUB_OUTPUT
+          printf 'workspaceFolder=%s\n' "$(realpath "$GITHUB_WORKSPACE")" >> $GITHUB_OUTPUT
+          printf 'tempFolder=%s\n' "$(realpath "$RUNNER_TEMP")" >> $GITHUB_OUTPUT
       - name: checkout
         uses: actions/checkout@v3.5.2
       - name: installPackages
@@ -143,13 +152,48 @@ jobs:
               fi
             fi
           done
-      - name: ls .
+      - id: lsHome
+        if: ${{ steps.prepare.outcome == 'success' && steps.prepare.outputs.homeFolder != '' }}
+        name: ls ${{ steps.prepare.outputs.homeFolder }}
         shell: bash
+        env:
+          target: ${{ steps.prepare.outputs.homeFolder }}
         run: |
-          realpath .
-          ls -l --almost-all --color=always --si --literal --group-directories-first
-      - name: ls ..
+          set -o xtrace
+          ls -l --almost-all --color=always --si --literal --group-directories-first "$target"
+      - id: lsCwd
+        if: ${{ steps.prepare.outcome == 'success' && steps.prepare.outputs.cwdFolder != '' }}
+        name: ls ${{ steps.prepare.outputs.cwdFolder }}
         shell: bash
+        env:
+          target: ${{ steps.prepare.outputs.cwdFolder }}
         run: |
-          realpath ..
-          ls -l --almost-all --color=always --si --literal --group-directories-first ..
+          set -o xtrace
+          ls -l --almost-all --color=always --si --literal --group-directories-first "$target"
+      - id: lsCwdParent
+        if: ${{ steps.prepare.outcome == 'success' && steps.prepare.outputs.cwdParentFolder != '' }}
+        name: ls ${{ steps.prepare.outputs.cwdParentFolder }}
+        shell: bash
+        env:
+          target: ${{ steps.prepare.outputs.cwdParentFolder }}
+        run: |
+          set -o xtrace
+          ls -l --almost-all --color=always --si --literal --group-directories-first "$target"
+      - id: lsWorkspace
+        if: ${{ steps.prepare.outcome == 'success' && steps.prepare.outputs.workspaceFolder != '' }}
+        name: ls ${{ steps.prepare.outputs.workspaceFolder }}
+        shell: bash
+        env:
+          target: ${{ steps.prepare.outputs.workspaceFolder }}
+        run: |
+          set -o xtrace
+          ls -l --almost-all --color=always --si --literal --group-directories-first "$target"
+      - id: lsTemp
+        if: ${{ steps.prepare.outcome == 'success' && steps.prepare.outputs.tempFolder != '' }}
+        name: ls ${{ steps.prepare.outputs.tempFolder }}
+        shell: bash
+        env:
+          target: ${{ steps.prepare.outputs.tempFolder }}
+        run: |
+          set -o xtrace
+          ls -l --almost-all --color=always --si --literal --group-directories-first "$target"
