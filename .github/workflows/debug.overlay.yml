@@ -29,6 +29,12 @@ jobs:
         shell: bash
         run: |
           cat /etc/group
+      - name: dumpStrategy
+        shell: bash
+        env:
+          object: ${{ toJson(strategy) }}
+        run: |
+          jq --indent 2 --color-output . <<< "$object"
       - name: dumpEnv
         shell: bash
         env:
