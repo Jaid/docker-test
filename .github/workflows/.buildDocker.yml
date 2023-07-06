@@ -76,7 +76,9 @@ jobs:
           cache-dependency-path: ${{ env.HOME }}/package-lock.json
       - name: installNodePackages
         shell: bash
-        run: npm install --global @actions/core read-file-string execa vm2 fs-extra
+        run: |
+          cd
+          npm install @actions/core read-file-string execa vm2 fs-extra
       - id: getInputs
         shell: sh -c "node --input-type module < {0}"
         env:
