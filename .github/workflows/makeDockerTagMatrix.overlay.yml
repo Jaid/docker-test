@@ -34,12 +34,17 @@ jobs:
       output: ${{ steps.makeMatrix.outputs.value }}
       nativeArch: ${{ steps.makeMatrix.outputs.nativeArch }}
     steps:
+      - name: getWorkspaceFolder
+        id: getWorkspaceFolder
+        shell: bash
+        run: |
+          printf value=%s "$RUNNER_WORKSPACE" > $GITHUB_OUTPUT
       - name: setupNode
         uses: actions/setup-node@v3.7.0
         with:
           node-version: latest
           cache: npm
-          cache-dependency-path: ${{ env }}/package-lock.json
+          cache-dependency-path: ${{steps.getWorkspaceFolder.outputs.value}}/package-lock.json
       - name: installNodePackages
         shell: bash
         run: |
