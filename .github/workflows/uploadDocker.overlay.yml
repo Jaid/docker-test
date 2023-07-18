@@ -1,0 +1,288 @@
+name: abc
+on:
+  workflow_call:
+    inputs:
+      # arch:
+      #   type: string
+      #   required: false
+      #   default: linux/amd64
+      #   description: Image arch to build and run
+      imageFolder:
+        type: string
+        required: false
+        description: Folder to save the build to
+      imageFile:
+        type: string
+        required: false
+        description: File basename of image to save the build to
+        default: image.tar
+      imageArtifact:
+        type: string
+        required: false
+        description: Name of the image artifact to save the build to
+      dockerHubUser:
+        type: string
+        required: false
+        default: ''
+        description: If unset, the Docker Hub user will be the same as the GitHub user
+      dockerHubRegistry:
+        type: string
+        required: false
+        default: docker.io
+      githubRegistry:
+        type: string
+        required: false
+        default: ghcr.io
+      baseTags:
+        type: string
+        required: false
+        default: type=ref,event=branch
+      addShaTags:
+        type: boolean
+        required: false
+        default: false
+        description: If true, create a Docker image tag named after the commit’s SHA hash (good for persistence and debugging, but might produce a lot of clutter)
+      addScheduleTags:
+        type: boolean
+        required: false
+        default: false
+        description: If true, create Docker image tags named after the current date (good for persistence and debugging, but might produce a lot of clutter) (only on schedule events)
+      addVersionTag:
+        type: boolean
+        required: false
+        default: false
+        description: If true, create a Docker image tag named after the new current version (only on push tag events)
+      versionTagPrefix:
+        type: string
+        required: false
+        default: ''
+        description: Will be appended to the automatically generated version tag (only if addVersionTag is true and event is push tag)
+      additionalTags:
+        type: string
+        required: false
+        default: null
+      versionTag:
+        type: string
+        required: false
+        default: null
+      versionTagSemverPrefix:
+        type: string
+        required: false
+        default: null
+        description: If given, this will be the semver’s prefix
+      flavorLatest:
+        type: string
+        required: false
+        default: auto
+      flavorPrefix:
+        type: string
+        required: false
+        default: ''
+      flavorSuffix:
+        type: string
+        required: false
+        default: ''
+      flavorConnectionString:
+        type: string
+        required: false
+        default: '-'
+      jobName:
+        type: string
+        required: false
+        description: Name of the job to run
+        default: ${{ github.workflow }}${{ inputs.id && inputs.id != 'default' && format(' ({0})', inputs.id)}}
+      id:
+        type: string
+        required: false
+        description: ID of the image
+jobs:
+  build:
+    name: ${{ inputs.jobName }}
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3.5.3
+      - name: setupNode
+        uses: actions/setup-node@v3.7.0
+        with:
+          node-version: latest
+      - name: installNodePackages
+        shell: bash
+        run: npm install --no-save --no-package-lock @actions/core @actions/github read-file-string
+      - id: getInputs
+        shell: sh -c "node --input-type module < {0}"
+        env:
+          inputs: ${{ toJSON(inputs) }}
+          github: ${{ toJSON(github) }}
+        run: |
+          import core from '@actions/core'
+          const inputs = JSON.parse(process.env.inputs)
+          const github = JSON.parse(process.env.github)
+          const setOutput = (value, name = 'value') => {
+            core.setOutput(name, value)
+            core.info(`Output ${name}: ${value}`)
+          }
+          const outputs = {
+            ...inputs
+          }
+          if (!outputs.id) {
+            outputs.id = 'default'
+          }
+          if (!outputs.imageArtifact) {
+            outputs.imageArtifact = `${github.run_id}_${outputs.id}`
+          }
+          if (!outputs.imageFolder) {
+            outputs.imageFolder = `/tmp/dockerBuild/${github.run_id}_${outputs.id}`
+          }
+          for (const [key, value] of Object.entries(outputs)) {
+            setOutput(value, key)
+          }
+          setOutput(JSON.stringify(outputs))
+      - name: getDockerHubTokenLength
+        id: getDockerHubTokenLength
+        shell: sh -c "node --input-type module < {0}"
+        env:
+          secrets: ${{ toJSON(secrets) }}
+        run: |
+          import core from '@actions/core'
+          const secrets = JSON.parse(process.env.secrets)
+          const setOutput = (value, name = 'value') => {
+            core.setOutput(name, value)
+            core.info(`Output ${name}: ${value}`)
+          }
+          setOutput(secrets.dockerHubToken?.length ?? 0)
+      - name: getGithubPackagesRef
+        id: getGithubPackagesRef
+        shell: sh -c "node --input-type module < {0}"
+        env:
+          inputs: ${{ steps.getInputs.outputs.value }}
+        run: |
+          import core from '@actions/core'
+          import { context } from '@actions/github'
+          const inputs = JSON.parse(process.env.inputs)
+          const setOutput = (value, name = 'value') => {
+            core.setOutput(name, value)
+            core.info(`Output ${name}: ${value}`)
+          }
+          const githubRef = `${inputs.githubRegistry}/${context.payload.repository.full_name.toLowerCase()}`
+          setOutput(githubRef)
+      - name: getDockerHubRef
+        id: getDockerHubRef
+        if: ${{ steps.getDockerHubTokenLength.outputs.value > 0 }}
+        shell: sh -c "node --input-type module < {0}"
+        env:
+          inputs: ${{ steps.getInputs.outputs.value }}
+          dockerHubRef: ${{ needs.getDockerImageName.outputs.imageSlug }}
+          dockerHubTokenLength: ${{ steps.getDockerHubTokenLength.outputs.value }}
+        run: |
+          import core from '@actions/core'
+          const inputs = JSON.parse(process.env.inputs)
+          const setOutput = (value, name = 'value') => {
+            core.setOutput(name, value)
+            core.info(`Output ${name}: ${value}`)
+          }
+          if (process.env.dockerHubTokenLength > 0) {
+            const dockerHubRef = `${inputs.dockerHubRegistry}/${process.env.dockerHubRef}`
+            setOutput(dockerHubRef)
+          }
+      - name: getRefs
+        id: getRefs
+        shell: sh -c "node --input-type module < {0}"
+        env:
+          inputs: ${{ steps.getInputs.outputs.value }}
+          githubRef: ${{ steps.getGithubPackagesRef.outputs.value }}
+          dockerHubRef: ${{ steps.getDockerHubRef.outputs.value }}
+        run: |
+          import core from '@actions/core'
+          import { context } from '@actions/github'
+          const inputs = JSON.parse(process.env.inputs)
+          const setOutput = (value, name = 'value') => {
+            core.setOutput(name, value)
+            core.info(`Output ${name}: ${value}`)
+          }
+          const refs = [process.env.githubRef]
+          if (process.env.dockerHubRef) {
+            refs.push(process.env.dockerHubRef)
+          }
+          const output = refs.join('\n')
+          setOutput(output)
+      - name: prepareVersionTag
+        id: prepareVersionTag
+        shell: sh -c "node --input-type module < {0}"
+        env:
+          inputs: ${{ steps.getInputs.outputs.value }}
+        run: |
+          import core from '@actions/core'
+          const inputs = JSON.parse(process.env.inputs)
+          const setOutput = (value, name = 'value') => {
+            core.setOutput(name, value)
+            core.info(`Output ${name}: ${value}`)
+          }
+          const getCleanedVersionTag = tag => {
+            if (!tag) {
+              return ''
+            }
+            if (inputs.versionTagSemverPrefix == null) {
+              return tag
+            }
+            const semver = /(?<versionPrefix>v?)(?<version>\d+\.\d+\.\d+)/.exec(tag)?.groups
+            if (semver) {
+              return `${inputs.versionTagSemverPrefix}${semver.version}`
+            }
+            return tag
+          }
+          setOutput(getCleanedVersionTag(inputs.versionTag))
+      - name: getTags
+        id: getTags
+        shell: sh -c "node --input-type module < {0}"
+        env:
+          inputs: ${{ steps.getInputs.outputs.value }}
+          versionTag: ${{ steps.prepareVersionTag.outputs.value }}
+        run: |
+          import core from '@actions/core'
+          const inputs = JSON.parse(process.env.inputs)
+          const steps = JSON.parse(process.env.steps)
+          const setOutput = (value, name = 'value') => {
+            core.setOutput(name, value)
+            core.info(`Output ${name}: ${value}`)
+          }
+          const tags = []
+          const add = input => {
+            if (!input) {
+              return
+            }
+            let addition
+            if (typeof input === 'string') {
+              addition = input.split('\n')
+            } else {
+              addition = input
+            }
+            for (const tag of addition) {
+              if (tag) {
+                console.dir(tag)
+                tags.push(tag.trim())
+              }
+            }
+          }
+          add(inputs.baseTags)
+          add(inputs.additionalTags)
+          if (process.env.versionTag) {
+            add(`type=raw,value=${process.env.versionTag}`)
+          }
+          if (inputs.addVersionTag) {
+            add(`type=pep440,pattern=${inputs.versionTagPrefix ?? ''}{{version}}`)
+          }
+          if (inputs.addShaTags) {
+            add('type=sha,format=long')
+          }
+          if (inputs.addScheduleTags) {
+            add('type=schedule,pattern=nightly')
+            add('type=schedule,pattern={{date \'YYYYMMDD\'}}')
+          }
+          if (!tags.length) {
+            core.error('No tags given')
+            process.exit(1)
+          }
+          setOutput(tags.join('\n'))
