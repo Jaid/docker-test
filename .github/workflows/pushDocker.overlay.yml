@@ -172,241 +172,215 @@ jobs:
       appArgs: ${{ inputs.testAppArgs }}
       testEval: ${{ inputs.testEval }}
       id: ${{ matrix.id }}
-  # push:
-  #   needs:
-  #     - getDockerImageName
-  #     - makeMatrix
-  #     - test
-  #   name: push${{ matrix.id && format(' ({0})', matrix.id) }}
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     packages: write
-  #     contents: read
-  #   strategy:
-  #     matrix:
-  #       include: ${{ fromJson(needs.makeMatrix.outputs.output) }}
-  #   outputs:
-  #     meta: ${{ steps.dockerPush.outputs.metadata }}
-  #     digest: ${{ steps.dockerPush.outputs.digest }}
-  #     imageId: ${{ steps.dockerPush.outputs.imageid }}
-  #     imageSlug: ${{ needs.getDockerImageName.outputs.imageSlug }}
-  #     imageUser: ${{ needs.getDockerImageName.outputs.imageUser }}
-  #     imageName: ${{ needs.getDockerImageName.outputs.imageName }}
-  #   steps:
-  #     - name: checkout
-  #       uses: actions/checkout@v3.5.3
-  #     - name: setupNode
-  #       uses: actions/setup-node@v3.7.0
-  #       with:
-  #         node-version: latest
-  #     - name: installNodePackages
-  #       shell: bash
-  #       run: npm install --no-save --no-package-lock @actions/core @actions/github read-file-string
-  #     - name: getDockerHubTokenLength
-  #       id: getDockerHubTokenLength
-  #       shell: sh -c "node --input-type module < {0}"
-  #       env:
-  #         secrets: ${{ toJSON(secrets) }}
-  #       run: |
-  #         import core from '@actions/core'
-  #         const secrets = JSON.parse(process.env.secrets)
-  #         core.setOutput('length', secrets.dockerHubToken?.length ?? 0)
-  #     - name: getCacheInstruction
-  #       id: getCacheInstruction
-  #       shell: sh -c "node --input-type module < {0}"
-  #       env:
-  #         needs: ${{ toJSON(needs) }}
-  #         steps: ${{ toJSON(steps) }}
-  #       run: |
-  #         import core from '@actions/core'
-  #         const needs = JSON.parse(process.env.needs)
-  #         const steps = JSON.parse(process.env.steps)
-  #         const setCacheInstruction = cacheInstruction => {
-  #           core.setOutput('cache-from', cacheInstruction)
-  #           core.setOutput('cache-to', `${cacheInstruction},mode=max`)
-  #         }
-  #         if (steps.getDockerHubTokenLength.outputs.length > 0) {
-  #           setCacheInstruction(`type=registry,ref=${needs.getDockerImageName.outputs.imageSlug}:buildcache`)
-  #         } else {
-  #           setCacheInstruction('type=gha')
-  #         }
-  #     - name: getImageRefs
-  #       id: getImageRefs
-  #       shell: sh -c "node --input-type module < {0}"
-  #       env:
-  #         inputs: ${{ toJSON(inputs) }}
-  #         dockerHubRef: ${{ needs.getDockerImageName.outputs.imageSlug }}
-  #         getDockerHubTokenLength: ${{ steps.getDockerHubTokenLength.outputs.length }}
-  #       run: |
-  #         import core from '@actions/core'
-  #         import { context } from '@actions/github'
-  #         const inputs = JSON.parse(process.env.inputs)
-  #         const refs = []
-  #         const githubRef = `${inputs.githubRegistry}/${context.payload.repository.full_name.toLowerCase()}`
-  #         console.dir({githubRef})
-  #         core.setOutput('githubRef', githubRef)
-  #         refs.push(githubRef)
-  #         if (process.env.getDockerHubTokenLength > 0) {
-  #           const dockerHubRef = `${inputs.dockerHubRegistry}/${process.env.dockerHubRef}`
-  #           console.dir({dockerHubRef})
-  #           core.setOutput('dockerHubRef', dockerHubRef)
-  #           refs.push(dockerHubRef)
-  #         }
-  #         const output = refs.join('\n')
-  #         console.dir({output})
-  #         core.setOutput('value', output)
-  #     - name: getArch
-  #       id: getArch
-  #       shell: sh -c "node --input-type module < {0}"
-  #       env:
-  #         inputs: ${{ toJSON(inputs) }}
-  #       run: |
-  #         import core from '@actions/core'
-  #         import readFileString from 'read-file-string'
-  #         const inputs = JSON.parse(process.env.inputs)
-  #         const getArch = async () => {
-  #           if (inputs.arch) {
-  #             return inputs.arch.split(',')
-  #           } else {
-  #             const archLines = await readFileString.default('arch.lines')
-  #             if (archLines) {
-  #               return archLines.split('\n').map(line => line.trim()).filter(Boolean)
-  #             } else {
-  #               return ['linux/amd64']
-  #             }
-  #           }
-  #         }
-  #         const archs = await getArch()
-  #         core.setOutput('arch', archs.join('\n'))
-  #     - name: prepareVersionTag
-  #       id: prepareVersionTag
-  #       shell: sh -c "node --input-type module < {0}"
-  #       env:
-  #         inputs: ${{ toJson(inputs) }}
-  #       run: |
-  #         import core from '@actions/core'
-  #         const inputs = JSON.parse(process.env.inputs)
-  #         const getCleanedVersionTag = tag => {
-  #           if (!tag) {
-  #             return ''
-  #           }
-  #           if (inputs.versionTagSemverPrefix == null) {
-  #             return tag
-  #           }
-  #           const semver = /(?<versionPrefix>v?)(?<version>\d+\.\d+\.\d+)/.exec(tag)?.groups
-  #           if (semver) {
-  #             return `${inputs.versionTagSemverPrefix}${semver.version}`
-  #           }
-  #           return tag
-  #         }
-  #         core.setOutput('versionTag', getCleanedVersionTag(inputs.versionTag))
-  #     - name: getTags
-  #       id: getTags
-  #       shell: sh -c "node --input-type module < {0}"
-  #       env:
-  #         inputs: ${{ toJSON(inputs) }}
-  #         steps: ${{ toJSON(steps) }}
-  #       run: |
-  #         import core from '@actions/core'
-  #         const inputs = JSON.parse(process.env.inputs)
-  #         const steps = JSON.parse(process.env.steps)
-  #         const tags = []
-  #         const add = input => {
-  #           if (!input) {
-  #             return
-  #           }
-  #           let addition
-  #           if (typeof input === 'string') {
-  #             addition = input.split('\n')
-  #           } else {
-  #             addition = input
-  #           }
-  #           for (const tag of addition) {
-  #             if (tag) {
-  #               console.dir(tag)
-  #               tags.push(tag.trim())
-  #             }
-  #           }
-  #         }
-  #         add(inputs.baseTags)
-  #         add(inputs.additionalTags)
-  #         if (steps.prepareVersionTag.outputs.versionTag) {
-  #           add(`type=raw,value=${steps.prepareVersionTag.outputs.versionTag}`)
-  #         }
-  #         if (inputs.addVersionTag) {
-  #           add(`type=pep440,pattern=${inputs.versionTagPrefix ?? ''}{{version}}`)
-  #         }
-  #         if (inputs.addShaTags) {
-  #           add('type=sha,format=long')
-  #         }
-  #         if (inputs.addScheduleTags) {
-  #           add('type=schedule,pattern=nightly')
-  #           add('type=schedule,pattern={{date \'YYYYMMDD\'}}')
-  #         }
-  #         if (!tags.length) {
-  #           core.error('No tags given')
-  #           process.exit(1)
-  #         }
-  #         core.setOutput('tags', tags.join('\n'))
-  #     - name: setupQemu
-  #       if: ${{ steps.getArch.outputs.arch != 'linux/amd64' }}
-  #       uses: docker/setup-qemu-action@v2.2.0
-  #       with:
-  #         platforms: ${{ steps.getArch.outputs.arch }}
-  #     - name: setupBuildx
-  #       uses: docker/setup-buildx-action@v2.8.0
-  #     - name: login (${{ needs.getDockerImageName.outputs.imageUser }} @ ${{ inputs.dockerHubRegistry }})
-  #       if: ${{ steps.getDockerHubTokenLength.outputs.length > 0 }}
-  #       uses: docker/login-action@v2.2.0
-  #       with:
-  #         username: ${{ needs.getDockerImageName.outputs.imageUser }}
-  #         password: ${{ secrets.dockerHubToken }}
-  #     - name: login (${{ github.actor }} @ ${{ inputs.githubRegistry }})
-  #       uses: docker/login-action@v2.2.0
-  #       with:
-  #         registry: ${{ inputs.githubRegistry }}
-  #         username: ${{ github.actor }}
-  #         password: ${{ secrets.GITHUB_TOKEN }}
-  #     - name: extractDockerMetadata
-  #       id: meta
-  #       uses: docker/metadata-action@v4.6.0
-  #       with:
-  #         images: ${{ steps.getImageRefs.outputs.imageRefs }}
-  #         labels: |
-  #           maintainer=${{ github.actor }}
-  #           org.opencontainers.image.vendor=${{ github.actor }}
-  #           org.opencontainers.image.title=${{ needs.getDockerImageName.outputs.imageName }}
-  #         tags: ${{ steps.getTags.outputs.tags }}
-  #         flavor: |
-  #           latest=${{ inputs.flavorLatest }}
-  #           prefix=${{ inputs.flavorPrefix && format('{0}{1}', inputs.flavorPrefix, inputs.flavorConnectionString) || '' }}
-  #           suffix=${{ inputs.flavorSuffix && format('{0}{1}', inputs.flavorConnectionString, inputs.flavorSuffix) || '' }}
-  #     - name: downloadTestImage
-  #       uses: actions/download-artifact@v3.0.2
-  #       with:
-  #         name: ${{ needs.test.outputs.imageArtifact }}
-  #         path: ${{ needs.test.outputs.imageFolder }}
-  #     - name: loadTestImage
-  #       run: |
-  #         docker load --input ${{ needs.test.outputs.imagePath }}
-  #     - id: debug
-  #       run: docker image ls
-  #     - name: dockerPush
-  #       id: dockerPush
-  #       uses: docker/build-push-action@v4.1.1
-  #       with:
-  #         context: ${{ inputs.buildContext }}
-  #         platforms: ${{ matrix.platform }}
-  #         tags: ${{ steps.meta.outputs.tags }}
-  #         labels: ${{ steps.meta.outputs.labels }}
-  #         cache-to: ${{ needs.test.outputs.cacheTo }}
-  #         cache-from: type=registry,ref=${{ steps.getDockerImageName.outputs.imageSlug }}
-  #         push: true
-  #     - name: dockerSyncReadme
-  #       if: ${{ steps.getDockerHubTokenLength.outputs.length > 0 && inputs.readmePath }}
-  #       uses: peter-evans/dockerhub-description@v3.4.1
-  #       with:
-  #         username: ${{ needs.getDockerImageName.outputs.imageUser }}
-  #         password: ${{ secrets.dockerHubToken }}
-  #         readme-filepath: ${{ inputs.readmePath }}
-  #         repository: ${{ needs.getDockerImageName.outputs.imageSlug }}
+  push:
+    needs:
+      - getDockerImageName
+      - makeMatrix
+      - test
+    name: push${{ matrix.id && format(' ({0})', matrix.id) }}
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    strategy:
+      matrix:
+        include: ${{ fromJson(needs.makeMatrix.outputs.output) }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3.5.3
+      - name: setupNode
+        uses: actions/setup-node@v3.7.0
+        with:
+          node-version: latest
+      - name: installNodePackages
+        shell: bash
+        run: npm install --no-save --no-package-lock @actions/core @actions/github read-file-string
+      - name: getDockerHubTokenLength
+        id: getDockerHubTokenLength
+        shell: sh -c "node --input-type module < {0}"
+        env:
+          secrets: ${{ toJSON(secrets) }}
+        run: |
+          import core from '@actions/core'
+          const secrets = JSON.parse(process.env.secrets)
+          core.setOutput('length', secrets.dockerHubToken?.length ?? 0)
+      - name: getImageRefs
+        id: getImageRefs
+        shell: sh -c "node --input-type module < {0}"
+        env:
+          inputs: ${{ toJSON(inputs) }}
+          dockerHubRef: ${{ needs.getDockerImageName.outputs.imageSlug }}
+          getDockerHubTokenLength: ${{ steps.getDockerHubTokenLength.outputs.length }}
+        run: |
+          import core from '@actions/core'
+          import { context } from '@actions/github'
+          const inputs = JSON.parse(process.env.inputs)
+          const setOutput = (value, name = 'value') => {
+            core.setOutput(name, value)
+            console.dir('Output', {name, value})
+          }
+          const refs = []
+          const githubRef = `${inputs.githubRegistry}/${context.payload.repository.full_name.toLowerCase()}`
+          setOutput(githubRef, 'githubRef')
+          refs.push(githubRef)
+          if (process.env.getDockerHubTokenLength > 0) {
+            const dockerHubRef = `${inputs.dockerHubRegistry}/${process.env.dockerHubRef}`
+            setOutput(dockerHubRef, 'dockerHubRef')
+            refs.push(dockerHubRef)
+          }
+          const output = refs.join('\n')
+          setOutput(output)
+      # - name: getArch
+      #   id: getArch
+      #   shell: sh -c "node --input-type module < {0}"
+      #   env:
+      #     inputs: ${{ toJSON(inputs) }}
+      #   run: |
+      #     import core from '@actions/core'
+      #     import readFileString from 'read-file-string'
+      #     const inputs = JSON.parse(process.env.inputs)
+      #     const getArch = async () => {
+      #       if (inputs.arch) {
+      #         return inputs.arch.split(',')
+      #       } else {
+      #         const archLines = await readFileString.default('arch.lines')
+      #         if (archLines) {
+      #           return archLines.split('\n').map(line => line.trim()).filter(Boolean)
+      #         } else {
+      #           return ['linux/amd64']
+      #         }
+      #       }
+      #     }
+      #     const archs = await getArch()
+      #     core.setOutput('arch', archs.join('\n'))
+      # - name: prepareVersionTag
+      #   id: prepareVersionTag
+      #   shell: sh -c "node --input-type module < {0}"
+      #   env:
+      #     inputs: ${{ toJson(inputs) }}
+      #   run: |
+      #     import core from '@actions/core'
+      #     const inputs = JSON.parse(process.env.inputs)
+      #     const getCleanedVersionTag = tag => {
+      #       if (!tag) {
+      #         return ''
+      #       }
+      #       if (inputs.versionTagSemverPrefix == null) {
+      #         return tag
+      #       }
+      #       const semver = /(?<versionPrefix>v?)(?<version>\d+\.\d+\.\d+)/.exec(tag)?.groups
+      #       if (semver) {
+      #         return `${inputs.versionTagSemverPrefix}${semver.version}`
+      #       }
+      #       return tag
+      #     }
+      #     core.setOutput('versionTag', getCleanedVersionTag(inputs.versionTag))
+      # - name: getTags
+      #   id: getTags
+      #   shell: sh -c "node --input-type module < {0}"
+      #   env:
+      #     inputs: ${{ toJSON(inputs) }}
+      #     steps: ${{ toJSON(steps) }}
+      #   run: |
+      #     import core from '@actions/core'
+      #     const inputs = JSON.parse(process.env.inputs)
+      #     const steps = JSON.parse(process.env.steps)
+      #     const tags = []
+      #     const add = input => {
+      #       if (!input) {
+      #         return
+      #       }
+      #       let addition
+      #       if (typeof input === 'string') {
+      #         addition = input.split('\n')
+      #       } else {
+      #         addition = input
+      #       }
+      #       for (const tag of addition) {
+      #         if (tag) {
+      #           console.dir(tag)
+      #           tags.push(tag.trim())
+      #         }
+      #       }
+      #     }
+      #     add(inputs.baseTags)
+      #     add(inputs.additionalTags)
+      #     if (steps.prepareVersionTag.outputs.versionTag) {
+      #       add(`type=raw,value=${steps.prepareVersionTag.outputs.versionTag}`)
+      #     }
+      #     if (inputs.addVersionTag) {
+      #       add(`type=pep440,pattern=${inputs.versionTagPrefix ?? ''}{{version}}`)
+      #     }
+      #     if (inputs.addShaTags) {
+      #       add('type=sha,format=long')
+      #     }
+      #     if (inputs.addScheduleTags) {
+      #       add('type=schedule,pattern=nightly')
+      #       add('type=schedule,pattern={{date \'YYYYMMDD\'}}')
+      #     }
+      #     if (!tags.length) {
+      #       core.error('No tags given')
+      #       process.exit(1)
+      #     }
+      #     core.setOutput('tags', tags.join('\n'))
+      # - name: setupQemu
+      #   if: ${{ steps.getArch.outputs.arch != 'linux/amd64' }}
+      #   uses: docker/setup-qemu-action@v2.2.0
+      #   with:
+      #     platforms: ${{ steps.getArch.outputs.arch }}
+      # - name: setupBuildx
+      #   uses: docker/setup-buildx-action@v2.8.0
+      # - name: login (${{ needs.getDockerImageName.outputs.imageUser }} @ ${{ inputs.dockerHubRegistry }})
+      #   if: ${{ steps.getDockerHubTokenLength.outputs.length > 0 }}
+      #   uses: docker/login-action@v2.2.0
+      #   with:
+      #     username: ${{ needs.getDockerImageName.outputs.imageUser }}
+      #     password: ${{ secrets.dockerHubToken }}
+      # - name: login (${{ github.actor }} @ ${{ inputs.githubRegistry }})
+      #   uses: docker/login-action@v2.2.0
+      #   with:
+      #     registry: ${{ inputs.githubRegistry }}
+      #     username: ${{ github.actor }}
+      #     password: ${{ secrets.GITHUB_TOKEN }}
+      # - name: extractDockerMetadata
+      #   id: meta
+      #   uses: docker/metadata-action@v4.6.0
+      #   with:
+      #     images: ${{ steps.getImageRefs.outputs.imageRefs }}
+      #     labels: |
+      #       maintainer=${{ github.actor }}
+      #       org.opencontainers.image.vendor=${{ github.actor }}
+      #       org.opencontainers.image.title=${{ needs.getDockerImageName.outputs.imageName }}
+      #     tags: ${{ steps.getTags.outputs.tags }}
+      #     flavor: |
+      #       latest=${{ inputs.flavorLatest }}
+      #       prefix=${{ inputs.flavorPrefix && format('{0}{1}', inputs.flavorPrefix, inputs.flavorConnectionString) || '' }}
+      #       suffix=${{ inputs.flavorSuffix && format('{0}{1}', inputs.flavorConnectionString, inputs.flavorSuffix) || '' }}
+      # - name: downloadTestImage
+      #   uses: actions/download-artifact@v3.0.2
+      #   with:
+      #     name: ${{ needs.test.outputs.imageArtifact }}
+      #     path: ${{ needs.test.outputs.imageFolder }}
+      # - name: loadTestImage
+      #   run: |
+      #     docker load --input ${{ needs.test.outputs.imagePath }}
+      # - id: debug
+      #   run: docker image ls
+      # - name: dockerPush
+      #   id: dockerPush
+      #   uses: docker/build-push-action@v4.1.1
+      #   with:
+      #     context: ${{ inputs.buildContext }}
+      #     platforms: ${{ matrix.platform }}
+      #     tags: ${{ steps.meta.outputs.tags }}
+      #     labels: ${{ steps.meta.outputs.labels }}
+      #     cache-to: ${{ needs.test.outputs.cacheTo }}
+      #     cache-from: type=registry,ref=${{ steps.getDockerImageName.outputs.imageSlug }}
+      #     push: true
+      # - name: dockerSyncReadme
+      #   if: ${{ steps.getDockerHubTokenLength.outputs.length > 0 && inputs.readmePath }}
+      #   uses: peter-evans/dockerhub-description@v3.4.1
+      #   with:
+      #     username: ${{ needs.getDockerImageName.outputs.imageUser }}
+      #     password: ${{ secrets.dockerHubToken }}
+      #     readme-filepath: ${{ inputs.readmePath }}
+      #     repository: ${{ needs.getDockerImageName.outputs.imageSlug }}
