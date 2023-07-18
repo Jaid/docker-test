@@ -243,7 +243,6 @@ jobs:
         run: |
           import core from '@actions/core'
           const inputs = JSON.parse(process.env.inputs)
-          const steps = JSON.parse(process.env.steps)
           const setOutput = (value, name = 'value') => {
             core.setOutput(name, value)
             core.info(`Output ${name}: ${value}`)
@@ -261,7 +260,6 @@ jobs:
             }
             for (const tag of addition) {
               if (tag) {
-                console.dir(tag)
                 tags.push(tag.trim())
               }
             }
