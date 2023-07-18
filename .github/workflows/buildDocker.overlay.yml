@@ -72,8 +72,6 @@ jobs:
         uses: actions/setup-node@v3.7.0
         with:
           node-version: latest
-          cache: npm
-          cache-dependency-path: ${{ env.HOME }}/package-lock.json
       - name: installNodePackages
         shell: bash
         run: |

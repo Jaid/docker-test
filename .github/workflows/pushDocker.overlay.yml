@@ -199,7 +199,6 @@ jobs:
   #       uses: actions/setup-node@v3.7.0
   #       with:
   #         node-version: latest
-  #         cache: npm
   #     - name: installNodePackages
   #       shell: bash
   #       run: npm install --global @actions/core @actions/github read-file-string
