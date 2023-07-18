@@ -56,7 +56,7 @@ jobs:
           const inputs = JSON.parse(process.env.inputs)
           const setOutput = (value, name = 'value') => {
             core.setOutput(name, value)
-            core.info(`Output ${name}: %O`, value)
+            core.info(`Output ${name}: ${value}`)
           }
           const flavorEval = inputs.flavorEval || `[
             baseShortcuts[base],
