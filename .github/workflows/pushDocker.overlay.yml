@@ -201,7 +201,7 @@ jobs:
   #         node-version: latest
   #     - name: installNodePackages
   #       shell: bash
-  #       run: npm install --global @actions/core @actions/github read-file-string
+  #       run: npm install --no-save --no-package-lock @actions/core @actions/github read-file-string
   #     - name: getDockerHubTokenLength
   #       id: getDockerHubTokenLength
   #       shell: sh -c "node --input-type module < {0}"

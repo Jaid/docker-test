@@ -49,7 +49,9 @@ jobs:
           node-version: latest
       - name: installNodePackages
         shell: bash
-        run: npm install --global @actions/core read-file-string execa vm2 fs-extra
+        run: |
+          cd
+          npm install --no-save --no-package-lock @actions/core read-file-string execa vm2 fs-extra
       - id: getInputs
         shell: sh -c "node --input-type module < {0}"
         env:
