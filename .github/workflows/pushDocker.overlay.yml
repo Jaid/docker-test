@@ -202,30 +202,89 @@ jobs:
         run: |
           import core from '@actions/core'
           const secrets = JSON.parse(process.env.secrets)
-          core.setOutput('length', secrets.dockerHubToken?.length ?? 0)
-      - name: getImageRefs
-        id: getImageRefs
+          const setOutput = (value, name = 'value') => {
+            core.setOutput(name, value)
+            core.info(`Output ${name}: ${value}`)
+          }
+          setOutput(secrets.dockerHubToken?.length ?? 0)
+      # - name: getImageRefs
+      #   id: getImageRefs
+      #   shell: sh -c "node --input-type module < {0}"
+      #   env:
+      #     inputs: ${{ toJSON(inputs) }}
+      #     dockerHubRef: ${{ needs.getDockerImageName.outputs.imageSlug }}
+      #     getDockerHubTokenLength: ${{ steps.getDockerHubTokenLength.outputs.length }}
+      #   run: |
+      #     import core from '@actions/core'
+      #     import { context } from '@actions/github'
+      #     const inputs = JSON.parse(process.env.inputs)
+      #     const setOutput = (value, name = 'value') => {
+      #       core.setOutput(name, value)
+      #       core.info(`Output ${name}: ${value}`)
+      #     }
+      #     const refs = []
+      #     const githubRef = `${inputs.githubRegistry}/${context.payload.repository.full_name.toLowerCase()}`
+      #     setOutput(githubRef, 'githubRef')
+      #     refs.push(githubRef)
+      #     if (process.env.getDockerHubTokenLength > 0) {
+      #       const dockerHubRef = `${inputs.dockerHubRegistry}/${process.env.dockerHubRef}`
+      #       setOutput(dockerHubRef, 'dockerHubRef')
+      #       refs.push(dockerHubRef)
+      #     }
+      #     const output = refs.join('\n')
+      #     setOutput(output)
+      - name: getGithubPackagesRef
+        id: getGithubPackagesRef
         shell: sh -c "node --input-type module < {0}"
         env:
           inputs: ${{ toJSON(inputs) }}
-          dockerHubRef: ${{ needs.getDockerImageName.outputs.imageSlug }}
-          getDockerHubTokenLength: ${{ steps.getDockerHubTokenLength.outputs.length }}
         run: |
           import core from '@actions/core'
           import { context } from '@actions/github'
           const inputs = JSON.parse(process.env.inputs)
           const setOutput = (value, name = 'value') => {
             core.setOutput(name, value)
-            console.dir('Output', {name, value})
+            core.info(`Output ${name}: ${value}`)
           }
-          const refs = []
           const githubRef = `${inputs.githubRegistry}/${context.payload.repository.full_name.toLowerCase()}`
-          setOutput(githubRef, 'githubRef')
-          refs.push(githubRef)
-          if (process.env.getDockerHubTokenLength > 0) {
+          setOutput(githubRef)
+      - name: getDockerHubRef
+        id: getDockerHubRef
+        if: ${{ steps.getDockerHubTokenLength.outputs.value > 0 }}
+        shell: sh -c "node --input-type module < {0}"
+        env:
+          inputs: ${{ toJSON(inputs) }}
+          dockerHubRef: ${{ needs.getDockerImageName.outputs.imageSlug }}
+          dockerHubTokenLength: ${{ steps.getDockerHubTokenLength.outputs.value }}
+        run: |
+          import core from '@actions/core'
+          const inputs = JSON.parse(process.env.inputs)
+          const setOutput = (value, name = 'value') => {
+            core.setOutput(name, value)
+            core.info(`Output ${name}: ${value}`)
+          }
+          if (process.env.dockerHubTokenLength > 0) {
             const dockerHubRef = `${inputs.dockerHubRegistry}/${process.env.dockerHubRef}`
-            setOutput(dockerHubRef, 'dockerHubRef')
-            refs.push(dockerHubRef)
+            setOutput(dockerHubRef)
+          }
+      - name: getRefs
+        id: getRefs
+        shell: sh -c "node --input-type module < {0}"
+        env:
+          inputs: ${{ toJSON(inputs) }}
+          githubRef: ${{ steps.getGithubPackagesRef.outputs.value }}
+          dockerHubRef: ${{ steps.getDockerHubRef.outputs.value }}
+        run: |
+          import core from '@actions/core'
+          import { context } from '@actions/github'
+          const inputs = JSON.parse(process.env.inputs)
+          const setOutput = (value, name = 'value') => {
+            core.setOutput(name, value)
+            core.info(`Output ${name}: ${value}`)
+          }
+          const refs = [process.env.githubRef]
+          if (process.env.dockerHubRef) {
+            refs.push(process.env.dockerHubRef)
           }
           const output = refs.join('\n')
           setOutput(output)
