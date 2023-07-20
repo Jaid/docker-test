@@ -71,10 +71,10 @@ jobs:
             outputs[exclusiveKey] = value
           }
           if (!outputs.imageArtifact) {
-            outputs.imageArtifact = `${github.run_id}_${outputs.id}`
+            outputs.imageArtifact = `${github.run_id}_${outputs.matrixId}`
           }
           if (!outputs.imageFolder) {
-            outputs.imageFolder = `/tmp/dockerBuild/${github.run_id}_${outputs.id}`
+            outputs.imageFolder = `/tmp/dockerBuild/${github.run_id}_${outputs.matrixId}`
           }
           for (const [key, value] of Object.entries(sortKeys(outputs))) {
             setOutput(value, key)
