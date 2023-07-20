@@ -86,27 +86,15 @@ jobs:
     needs: getInputs
     with:
       dockerHubUser: ${{ needs.getInputs.outputs.value.dockerHubUser }}
-  # makeMatrix:
-  #   name: makeMatrix
-  #   uses: ./.github/workflows/makeDockerTagMatrix.overlay.yml
-  #   with:
-  #     bases: ${{ inputs.matrixBases }}
-  #     platform: ${{ inputs.matrixPlatform }}
-  #     additionEvals: ${{ inputs.matrixAdditionEvals }}
-  #     flavorEval: ${{ inputs.matrixFlavorEval }}
-  # invoke:
-  #   name: build${{ matrix.id && format(' ({0})', matrix.id) }}
-  #   needs: makeMatrix
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       include: ${{ fromJson(needs.makeMatrix.outputs.output) }}
-  #   uses: ./.github/workflows/buildDocker.overlay.yml
-  #   with:
-  #     arch: ${{ matrix.platform }}
-  #     buildContext: ${{ inputs.buildContext }}
-  #     buildArgs: ${{ inputs.buildArgs }}
-  #     id: ${{ matrix.id }}
+  build:
+    name: build${{ inputs.nameSuffix }}
+    needs: getInputs
+    uses: ./.github/workflows/buildDocker.overlay.yml
+    with:
+      id: ${{ needs.getInputs.outputs.value.matrixId }}
+      arch: ${{ needs.getInputs.outputs.value.matrixArch }}
+      buildContext: ${{ needs.getInputs.outputs.value.buildContext }}
+      buildArgs: ${{ needs.getInputs.outputs.value.matrixBuildArgs }}
   # test:
   #   name: test${{ matrix.id && format(' ({0})', matrix.id) }}
   #   needs:
