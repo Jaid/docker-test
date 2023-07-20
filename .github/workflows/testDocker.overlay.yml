@@ -27,18 +27,13 @@ on:
         type: string
         required: false
         description: Name of the image artifact to save the build to
-      jobName:
-        type: string
-        required: false
-        description: Name of the job to run
-        default: ${{ github.workflow }}${{ inputs.id && inputs.id != 'default' && format(' ({0})', inputs.id)}}
       id:
         type: string
         required: false
         description: ID of the image
 jobs:
   test:
-    name: ${{ inputs.jobName }}
+    name: ${{ github.job.name }}${{ inputs.id != 'default' && format(' ({0})', inputs.id) || '' }}
     runs-on: ubuntu-latest
     steps:
       - name: checkout
