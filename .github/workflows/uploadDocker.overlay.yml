@@ -316,17 +316,17 @@ jobs:
             latest=${{ steps.getInputs.outputs.flavorLatest }}
             prefix=${{ steps.getInputs.outputs.flavorPrefix && format('{0}{1}', steps.getInputs.outputs.flavorPrefix, steps.getInputs.outputs.flavorConnectionString) || '' }}
             suffix=${{ steps.getInputs.outputs.flavorSuffix && format('{0}{1}', steps.getInputs.outputs.flavorConnectionString, steps.getInputs.outputs.flavorSuffix) || '' }}
-        - name: loadArtifact
-          uses: actions/download-artifact@v3.0.2
-          with:
-            name: ${{ steps.getInputs.outputs.imageArtifact }}
-            path: ${{ steps.getInputs.outputs.imageFolder }}
-        - name: dockerPush
-          id: dockerPush
-          uses: docker/build-push-action@v4.0.0
-          with:
-            load: ${{ steps.getInputs.outputs.imageFolder }}/${{ steps.getInputs.outputs.imageFile }}
-            platforms: ${{ steps.getInputs.outputs.arch }}
-            tags: ${{ steps.extractDockerMetadata.outputs.tags }}
-            labels: ${{ steps.extractDockerMetadata.outputs.labels }}
-            push: true
+      - name: loadArtifact
+        uses: actions/download-artifact@v3.0.2
+        with:
+          name: ${{ steps.getInputs.outputs.imageArtifact }}
+          path: ${{ steps.getInputs.outputs.imageFolder }}
+      - name: dockerPush
+        id: dockerPush
+        uses: docker/build-push-action@v4.0.0
+        with:
+          load: ${{ steps.getInputs.outputs.imageFolder }}/${{ steps.getInputs.outputs.imageFile }}
+          platforms: ${{ steps.getInputs.outputs.arch }}
+          tags: ${{ steps.extractDockerMetadata.outputs.tags }}
+          labels: ${{ steps.extractDockerMetadata.outputs.labels }}
+          push: true
