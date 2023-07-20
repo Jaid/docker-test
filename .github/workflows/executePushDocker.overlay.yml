@@ -66,15 +66,15 @@ jobs:
           const outputs = {
             ...passedInputs
           }
+          for (const [key, value] of Object.entries(matrixEntry)) {
+            const exclusiveKey = camelCase(`matrix ${key}`)
+            outputs[exclusiveKey] = value
+          }
           if (!outputs.imageArtifact) {
             outputs.imageArtifact = `${github.run_id}_${outputs.id}`
           }
           if (!outputs.imageFolder) {
             outputs.imageFolder = `/tmp/dockerBuild/${github.run_id}_${outputs.id}`
-          }
-          for (const [key, value] of Object.entries(matrixEntry)) {
-            const exclusiveKey = camelCase(`matrix ${key}`)
-            outputs[exclusiveKey] = value
           }
           for (const [key, value] of Object.entries(sortKeys(outputs))) {
             setOutput(value, key)
