@@ -120,7 +120,7 @@ jobs:
           if (!outputs.cacheTo) {
             outputs.cacheTo = `type=gha,scope=${outputs.cacheKey},mode=max`
           }
-          outputs.cacheHint = preventEnd(outputs.cacheTo, ',mode=max')
+          outputs.cacheHint = preventEnd.default(outputs.cacheTo, ',mode=max')
           if (!outputs.imageFile) {
             outputs.imageFile = `${outputs.imageName}.tar`
           }
