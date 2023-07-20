@@ -21,7 +21,6 @@ on:
         type: string
         required: false
         description: File basename of image to save the build to
-        default: image.tar
       imageArtifact:
         type: string
         required: false
@@ -38,6 +37,10 @@ on:
         type: string
         required: false
         description: Cache key to seperate unrelated caches
+      imageName:
+        type: string
+        required: true
+        description: Name of the image to build
       jobName:
         type: string
         required: false
@@ -52,8 +55,16 @@ on:
         value: ${{ jobs.build.outputs.inputs }}
       meta:
         value: ${{ jobs.build.outputs.meta }}
+      imageFile:
+        value: ${{ jobs.build.outputs.imageFile }}
+      imageFolder:
+        value: ${{ jobs.build.outputs.imageFolder }}
+      imageArtifact:
+        value: ${{ jobs.build.outputs.imageArtifact }}
       imagePath:
         value: ${{ jobs.build.outputs.imagePath }}
+      cacheHint:
+        value: ${{ jobs.build.outputs.cacheHint }}
 jobs:
   build:
     name: ${{ inputs.jobName }}
@@ -62,8 +73,12 @@ jobs:
       contents: read
     outputs:
       inputs: ${{ steps.getInputs.outputs.value }}
+      cacheHint: ${{ steps.getInputs.outputs.cacheHint }}
       meta: ${{ steps.buildImage.outputs.metadata }}
       imagePath: ${{ steps.getImagePath.outputs.value }}
+      imageFile: ${{ steps.getInputs.outputs.imageFile }}
+      imageFolder: ${{ steps.getInputs.outputs.imageFolder }}
+      imageArtifact: ${{ steps.getInputs.outputs.imageArtifact }}
     steps:
       - name: checkout
         uses: actions/checkout@v3.5.3
@@ -75,7 +90,7 @@ jobs:
         shell: bash
         run: |
           cd
-          npm install --no-save --no-package-lock @actions/core read-file-string execa vm2 fs-extra
+          npm install --no-save --no-package-lock @actions/core read-file-string execa vm2 fs-extra prevent-end
       - id: getInputs
         shell: sh -c "node --input-type module < {0}"
         env:
@@ -83,6 +98,7 @@ jobs:
           github: ${{ toJSON(github) }}
         run: |
           import core from '@actions/core'
+          import preventEnd from 'prevent-end'
           const inputs = JSON.parse(process.env.inputs)
           const github = JSON.parse(process.env.github)
           const setOutput = (value, name = 'value') => {
@@ -103,6 +119,10 @@ jobs:
           }
           if (!outputs.cacheTo) {
             outputs.cacheTo = `type=gha,scope=${outputs.cacheKey},mode=max`
+          }
+          output.cacheHint = preventEnd(outputs.cacheTo, ',mode=max')
+          if (!outputs.imageFile) {
+            outputs.imageFile = `${outputs.imageName}.tar`
           }
           if (!outputs.imageArtifact) {
             outputs.imageArtifact = `${github.run_id}_${outputs.id}`
@@ -150,7 +170,7 @@ jobs:
           outputs: type=docker,dest=${{ steps.getImagePath.outputs.value }}
           cache-to: ${{ steps.getInputs.outputs.cacheTo }}
           cache-from: ${{ steps.getInputs.outputs.cacheFrom }}
-          tags: test
+          tags: ${{ inputs.imageName }}:.build
       - name: saveArtifact
         if: ${{ steps.getInputs.outputs.imageArtifact }}
         uses: actions/upload-artifact@v3.1.2

@@ -14,6 +14,18 @@ on:
         type: string
         required: false
         description: Suffix for job naming (just a visual thing)
+      imageName:
+        type: string
+        required: true
+        description: Name of the Docker image
+      imageUser:
+        type: string
+        required: true
+        description: Docker Hub user or organization
+      imageSlug:
+        type: string
+        required: false
+        description: Slug of the Docker image
     secrets:
       dockerHubToken:
         required: false
@@ -70,6 +82,9 @@ jobs:
             const exclusiveKey = camelCase(`matrix ${key}`)
             outputs[exclusiveKey] = value
           }
+          if (!outputs.imageSlug) {
+            outputs.imageSlug = `${outputs.imageUser}/${outputs.imageName}`
+          }
           if (!outputs.imageArtifact) {
             outputs.imageArtifact = `${github.run_id}_${outputs.matrixId}`
           }
@@ -80,12 +95,6 @@ jobs:
             setOutput(value, key)
           }
           setOutput(JSON.stringify(outputs))
-  getDockerImageName:
-    name: getDockerImageName${{ inputs.nameSuffix }}
-    uses: jaid/workflows/.github/workflows/getDockerImageName.yml@main
-    needs: getInputs
-    with:
-      dockerHubUser: ${{ needs.getInputs.outputs.value.dockerHubUser }}
   build:
     name: build${{ inputs.nameSuffix }}
     needs: getInputs
@@ -95,6 +104,7 @@ jobs:
       arch: ${{ needs.getInputs.outputs.value.matrixArch }}
       buildContext: ${{ needs.getInputs.outputs.value.buildContext }}
       buildArgs: ${{ needs.getInputs.outputs.value.matrixBuildArgs }}
+      imageName: ${{ needs.getInputs.outputs.value.imageName }}
   test:
     if: ${{ needs.getInputs.outputs.value.matrixIsNativeArch }}
     name: test${{ inputs.nameSuffix }}

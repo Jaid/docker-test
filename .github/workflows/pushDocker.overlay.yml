@@ -68,11 +68,9 @@ on:
       flavorPrefix:
         type: string
         required: false
-        default: ''
       flavorSuffix:
         type: string
         required: false
-        default: ''
       flavorConnectionString:
         type: string
         required: false
@@ -84,7 +82,9 @@ on:
       buildArgs:
         type: string
         required: false
-        default: ''
+      imageName:
+        type: string
+        required: false
       ### testDocker
       testEval:
         type: string
@@ -133,9 +133,10 @@ on:
 jobs:
   getDockerImageName:
     name: getDockerImageName
-    uses: jaid/workflows/.github/workflows/getDockerImageName.yml@main
+    uses: ./.github/workflows/getDockerImageName.overlay.yml
     with:
       dockerHubUser: ${{ inputs.dockerHubUser }}
+      imageName: ${{ inputs.imageName }}
   makeMatrix:
     name: makeMatrix
     uses: ./.github/workflows/makeDockerTagMatrix.overlay.yml
@@ -145,7 +146,9 @@ jobs:
       additionEvals: ${{ inputs.matrixAdditionEvals }}
       flavorEval: ${{ inputs.matrixFlavorEval }}
   invoke:
-    needs: makeMatrix
+    needs:
+      - makeMatrix
+      - getDockerImageName
     name: invoke${{ matrix.id != 'default' && format(' ({0})', matrix.id) || '' }}
     strategy:
       fail-fast: false
@@ -155,6 +158,8 @@ jobs:
     with:
       passedInputs: ${{ toJson(inputs) }}
       matrixEntry: ${{ toJson(matrix) }}
+      imageName: ${{ needs.getDockerImageName.outputs.imageName }}
+      imageUser: ${{ needs.getDockerImageName.outputs.imageUser }}
       nameSuffix: ${{ matrix.id != 'default' && format(' ({0})', matrix.id) || '' }}
     secrets:
       dockerHubToken: ${{ secrets.dockerHubToken }}
