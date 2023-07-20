@@ -1,7 +1,11 @@
-name: pushDockera
+name: executePushDocker
 on:
   workflow_call:
     inputs:
+      id:
+        required: true
+        type: string
+        description: Identifier for this run
       passedInputs:
         type: string
         required: true
@@ -27,9 +31,10 @@ on:
         value: ${{ jobs.push.outputs.imageSlug }}
       imageUser:
         value: ${{ jobs.push.outputs.imageUser }}
+run-name: invoke${{ inputs.id && inputs.id != 'default' && format(' ({0})', inputs.id) }}
 jobs:
   getInputs:
-    name: getInputs
+    name: getInputs${{ inputs.id && inputs.id != 'default' && format(' ({0})', inputs.id) }}
     runs-on: ubuntu-latest
     outputs:
       value: ${{ steps.getInputs.outputs.value }}
@@ -40,7 +45,7 @@ jobs:
           node-version: latest
       - name: installNodePackages
         shell: bash
-        run: npm install --no-save --no-package-lock @actions/core lodash-es
+        run: npm install --no-save --no-package-lock @actions/core lodash-es sort-keys
       - id: getInputs
         shell: sh -c "node --input-type module < {0}"
         env:
@@ -48,6 +53,7 @@ jobs:
           github: ${{ toJSON(github) }}
         run: |
           import core from '@actions/core'
+          import sortKeys from 'sort-keys'
           import {camelCase} from 'lodash-es'
           const inputs = JSON.parse(process.env.inputs)
           const passedInputs = JSON.parse(inputs.passedInputs)
@@ -60,9 +66,6 @@ jobs:
           const outputs = {
             ...passedInputs
           }
-          if (!outputs.id) {
-            outputs.id = 'default'
-          }
           if (!outputs.imageArtifact) {
             outputs.imageArtifact = `${github.run_id}_${outputs.id}`
           }
@@ -73,15 +76,16 @@ jobs:
             const exclusiveKey = camelCase(`matrix ${key}`)
             outputs[exclusiveKey] = value
           }
-          for (const [key, value] of Object.entries(outputs)) {
+          for (const [key, value] of Object.entries(sortKeys(outputs))) {
             setOutput(value, key)
           }
           setOutput(JSON.stringify(outputs))
-  # getDockerImageName:
-  #   name: getDockerImageName
-  #   uses: jaid/workflows/.github/workflows/getDockerImageName.yml@main
-  #   with:
-  #     dockerHubUser: ${{ fromJson(inputs).dockerHubUser }}
+  getDockerImageName:
+    name: getDockerImageName${{ inputs.id && inputs.id != 'default' && format(' ({0})', inputs.id) }}
+    uses: jaid/workflows/.github/workflows/getDockerImageName.yml@main
+    needs: getInputs
+    with:
+      dockerHubUser: ${{ needs.getInputs.outputs.value.dockerHubUser }}
   # makeMatrix:
   #   name: makeMatrix
   #   uses: ./.github/workflows/makeDockerTagMatrix.overlay.yml

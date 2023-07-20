@@ -145,7 +145,6 @@ jobs:
       additionEvals: ${{ inputs.matrixAdditionEvals }}
       flavorEval: ${{ inputs.matrixFlavorEval }}
   invoke:
-    name: invoke${{ matrix.id && format(' ({0})', matrix.id) }}
     needs: makeMatrix
     strategy:
       fail-fast: false
@@ -153,6 +152,7 @@ jobs:
         include: ${{ fromJson(needs.makeMatrix.outputs.output) }}
     uses: ./.github/workflows/executePushDocker.overlay.yml
     with:
+      id: ${{ matrix.id || 'default' }}
       passedInputs: ${{ toJson(inputs) }}
       matrixEntry: ${{ toJson(matrix) }}
     secrets:
