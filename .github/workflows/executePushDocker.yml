@@ -1,0 +1,149 @@
+name: pushDockera
+on:
+  workflow_call:
+    inputs:
+      passedInputs:
+        type: string
+        required: true
+        description: JSON object containing all parent inputs
+      matrixEntry:
+        type: string
+        required: true
+        description: JSON object containing all matrix values
+    secrets:
+      dockerHubToken:
+        required: false
+        description: 'Create here with “Read, Write”: https://hub.docker.com/settings/security?generateToken=true'
+    outputs:
+      meta:
+        value: ${{ jobs.push.outputs.meta }}
+      digest:
+        value: ${{ jobs.push.outputs.digest }}
+      imageId:
+        value: ${{ jobs.push.outputs.imageId }}
+      imageName:
+        value: ${{ jobs.push.outputs.imageName }}
+      imageSlug:
+        value: ${{ jobs.push.outputs.imageSlug }}
+      imageUser:
+        value: ${{ jobs.push.outputs.imageUser }}
+jobs:
+  getInputs:
+    name: getInputs
+    runs-on: ubuntu-latest
+    outputs:
+      value: ${{ steps.getInputs.outputs.value }}
+    steps:
+      - name: setupNode
+        uses: actions/setup-node@v3.7.0
+        with:
+          node-version: latest
+      - name: installNodePackages
+        shell: bash
+        run: npm install --no-save --no-package-lock @actions/core lodash-es
+      - id: getInputs
+        shell: sh -c "node --input-type module < {0}"
+        env:
+          inputs: ${{ toJson(inputs) }}
+          github: ${{ toJSON(github) }}
+        run: |
+          import core from '@actions/core'
+          import {camelCase} from 'lodash-es'
+          const inputs = JSON.parse(process.env.inputs)
+          const passedInputs = JSON.parse(inputs.passedInputs)
+          const matrixEntry = JSON.parse(inputs.matrixEntry)
+          const github = JSON.parse(process.env.github)
+          const setOutput = (value, name = 'value') => {
+            core.setOutput(name, value)
+            core.info(`Output ${name}: ${value}`)
+          }
+          const outputs = {
+            ...passedInputs
+          }
+          if (!outputs.id) {
+            outputs.id = 'default'
+          }
+          if (!outputs.imageArtifact) {
+            outputs.imageArtifact = `${github.run_id}_${outputs.id}`
+          }
+          if (!outputs.imageFolder) {
+            outputs.imageFolder = `/tmp/dockerBuild/${github.run_id}_${outputs.id}`
+          }
+          for (const [key, value] of Object.entries(matrixEntry)) {
+            const exclusiveKey = camelCase(`matrix ${key}`)
+            outputs[exclusiveKey] = value
+          }
+          for (const [key, value] of Object.entries(outputs)) {
+            setOutput(value, key)
+          }
+          setOutput(JSON.stringify(outputs))
+  # getDockerImageName:
+  #   name: getDockerImageName
+  #   uses: jaid/workflows/.github/workflows/getDockerImageName.yml@main
+  #   with:
+  #     dockerHubUser: ${{ fromJson(inputs).dockerHubUser }}
+  # makeMatrix:
+  #   name: makeMatrix
+  #   uses: ./.github/workflows/makeDockerTagMatrix.overlay.yml
+  #   with:
+  #     bases: ${{ inputs.matrixBases }}
+  #     platform: ${{ inputs.matrixPlatform }}
+  #     additionEvals: ${{ inputs.matrixAdditionEvals }}
+  #     flavorEval: ${{ inputs.matrixFlavorEval }}
+  # invoke:
+  #   name: build${{ matrix.id && format(' ({0})', matrix.id) }}
+  #   needs: makeMatrix
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       include: ${{ fromJson(needs.makeMatrix.outputs.output) }}
+  #   uses: ./.github/workflows/buildDocker.overlay.yml
+  #   with:
+  #     arch: ${{ matrix.platform }}
+  #     buildContext: ${{ inputs.buildContext }}
+  #     buildArgs: ${{ inputs.buildArgs }}
+  #     id: ${{ matrix.id }}
+  # test:
+  #   name: test${{ matrix.id && format(' ({0})', matrix.id) }}
+  #   needs:
+  #     - makeMatrix
+  #     - build
+  #   strategy:
+  #     matrix:
+  #       include: ${{ fromJson(needs.makeMatrix.outputs.nativeArch) }}
+  #   uses: ./.github/workflows/testDocker.overlay.yml
+  #   with:
+  #     dockerRunArgs: ${{ inputs.testDockerRunArgs }}
+  #     appArgs: ${{ inputs.testAppArgs }}
+  #     testEval: ${{ inputs.testEval }}
+  #     id: ${{ matrix.id }}
+  # push:
+  #   name: push${{ matrix.id && format(' ({0})', matrix.id) }}
+  #   needs:
+  #     - getDockerImageName
+  #     - makeMatrix
+  #     - test
+  #     - build
+  #   permissions:
+  #     packages: write
+  #   strategy:
+  #     matrix:
+  #       include: ${{ fromJson(needs.makeMatrix.outputs.output) }}
+  #   uses: ./.github/workflows/uploadDocker.overlay.yml
+  #   with:
+  #     id: ${{ matrix.id }}
+  #     dockerHubUser: ${{ inputs.dockerHubUser }}
+  #     dockerHubRegistry: ${{ inputs.dockerHubRegistry }}
+  #     githubRegistry: ${{ inputs.githubRegistry }}
+  #     baseTags: ${{ inputs.baseTags }}
+  #     addShaTags: ${{ inputs.addShaTags }}
+  #     addScheduleTags: ${{ inputs.addScheduleTags }}
+  #     addVersionTag: ${{ inputs.addVersionTag }}
+  #     versionTagPrefix: ${{ inputs.versionTagPrefix }}
+  #     additionalTags: ${{ inputs.additionalTags }}
+  #     versionTag: ${{ inputs.versionTag }}
+  #     versionTagSemverPrefix: ${{ inputs.versionTagSemverPrefix }}
+  #     flavorLatest: ${{ inputs.flavorLatest }}
+  #     flavorPrefix: ${{ inputs.flavorPrefix }}
+  #     flavorSuffix: ${{ inputs.flavorSuffix }}
+  #     flavorConnectionString: ${{ inputs.flavorConnectionString }}

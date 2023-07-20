@@ -1,6 +1,6 @@
 {
   "explorer.fileNesting.patterns": {
     "debug.yml": "debug.overlay.yml",
-    "pushDocker.yml": "pushDocker.*,testDocker.*,makeDockerTagMatrix.*,buildDocker.*,uploadDocker.*",
+    "pushDocker.yml": "pushDocker.*,testDocker.*,makeDockerTagMatrix.*,buildDocker.*,uploadDocker.*,executePushDocker.*",
   },
 }

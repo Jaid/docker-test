@@ -144,61 +144,16 @@ jobs:
       platform: ${{ inputs.matrixPlatform }}
       additionEvals: ${{ inputs.matrixAdditionEvals }}
       flavorEval: ${{ inputs.matrixFlavorEval }}
-  build:
-    name: build${{ matrix.id && format(' ({0})', matrix.id) }}
-    needs:
-      - makeMatrix
+  invoke:
+    name: invoke${{ matrix.id && format(' ({0})', matrix.id) }}
+    needs: makeMatrix
     strategy:
       fail-fast: false
       matrix:
         include: ${{ fromJson(needs.makeMatrix.outputs.output) }}
-    uses: ./.github/workflows/buildDocker.overlay.yml
+    uses: ./.github/workflows/executePushDocker.overlay.yml
     with:
-      arch: ${{ matrix.platform }}
-      buildContext: ${{ inputs.buildContext }}
-      buildArgs: ${{ inputs.buildArgs }}
-      id: ${{ matrix.id }}
-  test:
-    name: test${{ matrix.id && format(' ({0})', matrix.id) }}
-    needs:
-      - makeMatrix
-      - build
-    strategy:
-      matrix:
-        include: ${{ fromJson(needs.makeMatrix.outputs.nativeArch) }}
-    uses: ./.github/workflows/testDocker.overlay.yml
-    with:
-      dockerRunArgs: ${{ inputs.testDockerRunArgs }}
-      appArgs: ${{ inputs.testAppArgs }}
-      testEval: ${{ inputs.testEval }}
-      id: ${{ matrix.id }}
-  push:
-    name: push${{ matrix.id && format(' ({0})', matrix.id) }}
-    needs:
-      - getDockerImageName
-      - makeMatrix
-      - test
-      - build
-    permissions:
-      packages: write
-    strategy:
-      matrix:
-        include: ${{ fromJson(needs.makeMatrix.outputs.output) }}
-    uses: ./.github/workflows/uploadDocker.overlay.yml
-    with:
-      id: ${{ matrix.id }}
-      dockerHubUser: ${{ inputs.dockerHubUser }}
-      dockerHubRegistry: ${{ inputs.dockerHubRegistry }}
-      githubRegistry: ${{ inputs.githubRegistry }}
-      baseTags: ${{ inputs.baseTags }}
-      addShaTags: ${{ inputs.addShaTags }}
-      addScheduleTags: ${{ inputs.addScheduleTags }}
-      addVersionTag: ${{ inputs.addVersionTag }}
-      versionTagPrefix: ${{ inputs.versionTagPrefix }}
-      additionalTags: ${{ inputs.additionalTags }}
-      versionTag: ${{ inputs.versionTag }}
-      versionTagSemverPrefix: ${{ inputs.versionTagSemverPrefix }}
-      flavorLatest: ${{ inputs.flavorLatest }}
-      flavorPrefix: ${{ inputs.flavorPrefix }}
-      flavorSuffix: ${{ inputs.flavorSuffix }}
-      flavorConnectionString: ${{ inputs.flavorConnectionString }}
+      passedInputs: ${{ toJson(inputs) }}
+      matrixEntry: ${{ toJson(matrix) }}
+    secrets:
+      dockerHubToken: ${{ secrets.dockerHubToken }}
