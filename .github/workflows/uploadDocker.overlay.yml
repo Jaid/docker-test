@@ -321,11 +321,20 @@ jobs:
         with:
           name: ${{ steps.getInputs.outputs.imageArtifact }}
           path: ${{ steps.getInputs.outputs.imageFolder }}
+      - name: loadImage
+        shell: bash
+        env:
+          imageFolder: ${{ steps.getInputs.outputs.imageFolder }}
+          imageFile: ${{ steps.getInputs.outputs.imageFile }}
+        run: |
+            docker load --input "$imageFolder/$imageFile"
+      - name: listDockerImages
+        shell: bash
+        run: docker images
       - name: dockerPush
         id: dockerPush
-        uses: docker/build-push-action@v4.0.0
+        uses: docker/build-push-action@v4.1.1
         with:
-          load: ${{ steps.getInputs.outputs.imageFolder }}/${{ steps.getInputs.outputs.imageFile }}
           platforms: ${{ steps.getInputs.outputs.arch }}
           tags: ${{ steps.extractDockerMetadata.outputs.tags }}
           labels: ${{ steps.extractDockerMetadata.outputs.labels }}
