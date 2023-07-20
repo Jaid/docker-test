@@ -2,10 +2,6 @@ name: executePushDocker
 on:
   workflow_call:
     inputs:
-      id:
-        required: true
-        type: string
-        description: Identifier for this run
       passedInputs:
         type: string
         required: true
@@ -14,6 +10,11 @@ on:
         type: string
         required: true
         description: JSON object containing all matrix values
+      nameSuffix:
+        type: string
+        required: false
+        description: Suffix for job naming (just a visual thing)
+        default: ${{ fromJson(inputs.matrixEntry).id != 'default' && format(' ({0})', fromJson(inputs.matrixEntry).id) || '' }}
     secrets:
       dockerHubToken:
         required: false
@@ -31,10 +32,10 @@ on:
         value: ${{ jobs.push.outputs.imageSlug }}
       imageUser:
         value: ${{ jobs.push.outputs.imageUser }}
-run-name: invoke${{ inputs.id && inputs.id != 'default' && format(' ({0})', inputs.id) }}
+run-name: invoke${{ inputs.nameSuffix }}
 jobs:
   getInputs:
-    name: getInputs${{ inputs.id && inputs.id != 'default' && format(' ({0})', inputs.id) }}
+    name: getInputs${{ inputs.nameSuffix }}
     runs-on: ubuntu-latest
     outputs:
       value: ${{ steps.getInputs.outputs.value }}
@@ -81,7 +82,7 @@ jobs:
           }
           setOutput(JSON.stringify(outputs))
   getDockerImageName:
-    name: getDockerImageName${{ inputs.id && inputs.id != 'default' && format(' ({0})', inputs.id) }}
+    name: getDockerImageName${{ inputs.nameSuffix }}
     uses: jaid/workflows/.github/workflows/getDockerImageName.yml@main
     needs: getInputs
     with:
