@@ -95,20 +95,18 @@ jobs:
       arch: ${{ needs.getInputs.outputs.value.matrixArch }}
       buildContext: ${{ needs.getInputs.outputs.value.buildContext }}
       buildArgs: ${{ needs.getInputs.outputs.value.matrixBuildArgs }}
-  # test:
-  #   name: test${{ matrix.id && format(' ({0})', matrix.id) }}
-  #   needs:
-  #     - makeMatrix
-  #     - build
-  #   strategy:
-  #     matrix:
-  #       include: ${{ fromJson(needs.makeMatrix.outputs.nativeArch) }}
-  #   uses: ./.github/workflows/testDocker.overlay.yml
-  #   with:
-  #     dockerRunArgs: ${{ inputs.testDockerRunArgs }}
-  #     appArgs: ${{ inputs.testAppArgs }}
-  #     testEval: ${{ inputs.testEval }}
-  #     id: ${{ matrix.id }}
+  test:
+    if: ${{ needs.getInputs.outputs.value.matrixIsNativeArch }}
+    name: test${{ inputs.nameSuffix }}
+    needs:
+      - getInputs
+      - build
+    uses: ./.github/workflows/testDocker.overlay.yml
+    with:
+      id: ${{ needs.getInputs.outputs.value.matrixId }}
+      dockerRunArgs: ${{ needs.getInputs.outputs.value.testDockerRunArgs }}
+      appArgs: ${{ needs.getInputs.outputs.value.testAppArgs }}
+      testEval: ${{ needs.getInputs.outputs.value.testEval }}
   # push:
   #   name: push${{ matrix.id && format(' ({0})', matrix.id) }}
   #   needs:
