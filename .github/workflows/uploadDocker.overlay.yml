@@ -95,9 +95,16 @@ on:
         required: false
         description: ID of the image
 jobs:
+  getDockerImageName:
+    name: getDockerImageName
+    uses: jaid/workflows/.github/workflows/getDockerImageName.yml@main
+    with:
+      dockerHubUser: ${{ inputs.dockerHubUser }}
   build:
     name: ${{ inputs.jobName }}
     runs-on: ubuntu-latest
+    needs:
+      - getDockerImageName
     permissions:
       packages: write
     steps:
@@ -283,15 +290,29 @@ jobs:
             process.exit(1)
           }
           setOutput(tags.join('\n'))
-      - name: login (${{ steps.getInputs.outputs.dockerHubUser }} @ ${{ inputs.dockerHubRegistry }})
+      - name: login (${{ steps.getInputs.outputs.dockerHubUser }} @ ${{ steps.getInputs.outputs.dockerHubRegistry }})
         if: ${{ steps.getDockerHubTokenLength.outputs.length > 0 }}
         uses: docker/login-action@v2.1.0
         with:
           username: ${{ steps.getInputs.outputs.dockerHubUser }}
           password: ${{ secrets.dockerHubToken }}
-      - name: login (${{ github.actor }} @ ${{ inputs.githubRegistry }})
+      - name: login (${{ github.actor }} @ ${{ steps.getInputs.outputs.githubRegistry }})
         uses: docker/login-action@v2.1.0
         with:
-          registry: ${{ inputs.githubRegistry }}
+          registry: ${{ steps.getInputs.outputs.githubRegistry }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: extractDockerMetadata
+        id: meta
+        uses: docker/metadata-action@v4.6.0
+        with:
+          images: ${{ steps.getRefs.outputs.value }}
+          labels: |
+            maintainer=${{ github.actor }}
+            org.opencontainers.image.vendor=${{ github.actor }}
+            org.opencontainers.image.title=${{ needs.getDockerImageName.outputs.imageName }}
+          tags: ${{ steps.getTags.outputs.tags }}
+          flavor: |
+            latest=${{ steps.getInputs.outputs.flavorLatest }}
+            prefix=${{ steps.getInputs.outputs.flavorPrefix && format('{0}{1}', steps.getInputs.outputs.flavorPrefix, steps.getInputs.outputs.flavorConnectionString) || '' }}
+            suffix=${{ steps.getInputs.outputs.flavorSuffix && format('{0}{1}', steps.getInputs.outputs.flavorConnectionString, steps.getInputs.outputs.flavorSuffix) || '' }}
