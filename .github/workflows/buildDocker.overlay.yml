@@ -67,7 +67,7 @@ on:
         value: ${{ jobs.build.outputs.cacheHint }}
 jobs:
   build:
-    name: ${{ inputs.jobName }}
+    name: ${{ github.job }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
