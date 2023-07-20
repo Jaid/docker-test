@@ -187,7 +187,7 @@ jobs:
     uses: ./.github/workflows/uploadDocker.overlay.yml
     with:
       id: ${{ matrix.id }}
-      jobName: ${{ needs.build.outputs.inputs.cacheTo }}
+      jobName: ${{ toJson(needs.build.outputs.inputs) }}
       dockerHubUser: ${{ inputs.dockerHubUser }}
       dockerHubRegistry: ${{ inputs.dockerHubRegistry }}
       githubRegistry: ${{ inputs.githubRegistry }}
