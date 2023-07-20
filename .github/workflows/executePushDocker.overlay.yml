@@ -14,7 +14,8 @@ on:
         type: string
         required: false
         description: Suffix for job naming (just a visual thing)
-        default: ${{ fromJson(inputs.matrixEntry).id != 'default' && format(' ({0})', fromJson(inputs.matrixEntry).id) || '' }}
+        default: ${{ inputs.matrixEntry }}
+        # default: ${{ fromJson(inputs.matrixEntry).id != 'default' && format(' ({0})', fromJson(inputs.matrixEntry).id) || '' }}
     secrets:
       dockerHubToken:
         required: false
