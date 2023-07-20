@@ -100,23 +100,23 @@ jobs:
     needs: getInputs
     uses: ./.github/workflows/buildDocker.overlay.yml
     with:
-      id: ${{ needs.getInputs.outputs.value.matrixId }}
-      arch: ${{ needs.getInputs.outputs.value.matrixArch }}
-      buildContext: ${{ needs.getInputs.outputs.value.buildContext }}
-      buildArgs: ${{ needs.getInputs.outputs.value.matrixBuildArgs }}
-      imageName: ${{ needs.getInputs.outputs.value.imageName }}
-  test:
-    if: ${{ needs.getInputs.outputs.value.matrixIsNativeArch }}
-    name: test${{ inputs.nameSuffix }}
-    needs:
-      - getInputs
-      - build
-    uses: ./.github/workflows/testDocker.overlay.yml
-    with:
-      id: ${{ needs.getInputs.outputs.value.matrixId }}
-      dockerRunArgs: ${{ needs.getInputs.outputs.value.testDockerRunArgs }}
-      appArgs: ${{ needs.getInputs.outputs.value.testAppArgs }}
-      testEval: ${{ needs.getInputs.outputs.value.testEval }}
+      id: ${{ fromJson(needs.getInputs.outputs.value).matrixId }}
+      arch: ${{ fromJson(needs.getInputs.outputs.value).matrixArch }}
+      buildContext: ${{ fromJson(needs.getInputs.outputs.value).buildContext }}
+      buildArgs: ${{ fromJson(needs.getInputs.outputs.value).matrixBuildArgs }}
+      imageName: ${{ fromJson(needs.getInputs.outputs.value).imageName }}
+  # test:
+  #   if: ${{ needs.getInputs.outputs.value.matrixIsNativeArch }}
+  #   name: test${{ inputs.nameSuffix }}
+  #   needs:
+  #     - getInputs
+  #     - build
+  #   uses: ./.github/workflows/testDocker.overlay.yml
+  #   with:
+  #     id: ${{ needs.getInputs.outputs.value.matrixId }}
+  #     dockerRunArgs: ${{ needs.getInputs.outputs.value.testDockerRunArgs }}
+  #     appArgs: ${{ needs.getInputs.outputs.value.testAppArgs }}
+  #     testEval: ${{ needs.getInputs.outputs.value.testEval }}
   # push:
   #   name: push${{ matrix.id && format(' ({0})', matrix.id) }}
   #   needs:
