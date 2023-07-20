@@ -90,7 +90,7 @@ jobs:
         shell: bash
         run: |
           cd
-          npm install --no-save --no-package-lock @actions/core read-file-string execa vm2 fs-extra prevent-end
+          npm install --no-save --no-package-lock @actions/core read-file-string execa vm2 fs-extra
       - id: getInputs
         shell: sh -c "node --input-type module < {0}"
         env:
@@ -98,7 +98,6 @@ jobs:
           github: ${{ toJSON(github) }}
         run: |
           import core from '@actions/core'
-          import preventEnd from 'prevent-end'
           const inputs = JSON.parse(process.env.inputs)
           const github = JSON.parse(process.env.github)
           const setOutput = (value, name = 'value') => {
@@ -120,7 +119,7 @@ jobs:
           if (!outputs.cacheTo) {
             outputs.cacheTo = `type=gha,scope=${outputs.cacheKey},mode=max`
           }
-          outputs.cacheHint = preventEnd.default(outputs.cacheTo, ',mode=max')
+          outputs.cacheHint = outputs.cacheTo.replace('mode=max', '').trim(',')
           if (!outputs.imageFile) {
             outputs.imageFile = `${outputs.imageName}.tar`
           }
