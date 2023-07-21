@@ -132,10 +132,12 @@ jobs:
             outputs.cacheKey = `${github.repository}|${github.workflow}|${github.ref_name}|${outputs.id}`
           }
           if (!outputs.cacheFrom) {
-            outputs.cacheFrom = `type=gha,scope=${outputs.cacheKey}`
+            // outputs.cacheFrom = `type=gha,scope=${outputs.cacheKey}`
+            outputs.cacheFrom = `type=registry,ref=${outputs.imageSlug}:cache`
           }
           if (!outputs.cacheTo) {
-            outputs.cacheTo = `type=gha,scope=${outputs.cacheKey},mode=max`
+            // outputs.cacheTo = `type=gha,scope=${outputs.cacheKey},mode=max`
+            outputs.cacheTo = `${outputs.cacheFrom},mode=max`
           }
           outputs.cacheHint = outputs.cacheTo.replace('mode=max', '').replace(/^,+/, '').replace(/,+$/, '').replace(/,+/g, ',')
           if (!outputs.imageArtifact) {

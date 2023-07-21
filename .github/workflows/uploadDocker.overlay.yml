@@ -97,7 +97,7 @@ on:
         required: false
         description: 'Create here with “Read, Write”: https://hub.docker.com/settings/security?generateToken=true'
 jobs:
-  build:
+  upload:
     name: ${{ github.job }}${{ inputs.nameSuffix }}
     runs-on: ubuntu-latest
     permissions:
