@@ -75,6 +75,8 @@ on:
         value: ${{ jobs.build.outputs.imageIdentifier }}
       context:
         value: ${{ jobs.build.outputs.context }}
+      buildArgs:
+        value: ${{ jobs.build.outputs.buildArgs }}
 jobs:
   build:
     name: ${{ github.job }}${{ inputs.nameSuffix }}
@@ -92,6 +94,7 @@ jobs:
       imageName: ${{ steps.getInputs.outputs.imageName }}
       imageIdentifier: ${{ steps.getInputs.outputs.imageIdentifier }}
       context: ${{ steps.getInputs.outputs.buildContext }}
+      buildArgs: ${{ steps.getInputs.outputs.buildArgs }}
     steps:
       - name: checkout
         uses: actions/checkout@v3.5.3

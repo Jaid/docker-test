@@ -330,3 +330,4 @@ jobs:
           labels: ${{ steps.extractDockerMetadata.outputs.labels }}
           cache-from: ${{ steps.getInputs.outputs.buildCacheHint }}
           context: ${{ steps.getInputs.outputs.buildContext }}
+          build-args: ${{ steps.getInputs.outputs.buildBuildArgs }}
