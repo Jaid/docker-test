@@ -17,8 +17,8 @@ jobs:
       matrixBases: a b
       matrixFlavorEval: |
         const baseSegment = base === 'a' ? false : base
-        const platformSegment = platformShortcuts[platform] ?? platform.replaceAll('/', '_')
-        const flavor = [baseSegment, platformSegment].filter(part => part?.length).join('-')
+        const platformSegment = platformShortcuts[platform] ?? platform.replaceAll('/', '_');
+        [baseSegment, platformSegment].filter(part => part?.length).join('-')
       testEval: stdout.length > 0
     secrets:
       dockerHubToken: ${{ secrets.dockerHubToken }}
