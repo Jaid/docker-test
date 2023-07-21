@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -o errexit -o pipefail -o xtrace
 
+echo "$1"
 if [[ $base = a ]]; then
   pyramidSize=10
 else
