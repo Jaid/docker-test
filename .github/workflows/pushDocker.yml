@@ -30,7 +30,7 @@ jobs:
         const baseSegment = base === 'a' ? false : base
         const platformSegment = platformShortcuts[platform] ?? platform.replaceAll('/', '_');
         [baseSegment, platformSegment].filter(part => part?.length).join('-')
-      testEval: stdout.length > 0
+      testEval: stdout.includes(':-):)') && stdout.includes('Min [ms')
       versionTag: ${{ github.event.release.tag_name }}
     secrets:
       dockerHubToken: ${{ secrets.dockerHubToken }}
