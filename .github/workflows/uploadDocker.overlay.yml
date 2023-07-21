@@ -141,9 +141,9 @@ jobs:
           }
           if (!outputs.title) {
             if (outputs.id === 'default') {
-              outputs.title = buildOutput.name
+              outputs.title = buildOutput.imageName
             } else {
-              outputs.title = `${buildOutput.name} (${outputs.id})`
+              outputs.title = `${buildOutput.imageName} (${outputs.id})`
             }
           }
           for (const [key, value] of Object.entries(sortKeys(outputs))) {
@@ -328,16 +328,5 @@ jobs:
           platforms: ${{ steps.getInputs.outputs.arch }}
           tags: ${{ steps.extractDockerMetadata.outputs.tags }}
           labels: ${{ steps.extractDockerMetadata.outputs.labels }}
-          cache-from: ${{ steps.getInputs.outputs.cacheFrom }}
+          cache-from: ${{ steps.getInputs.outputs.buildCacheHint }}
           context: ${{ steps.getInputs.outputs.buildContext }}
-          # - name: buildImage
-          # id: buildImage
-          # uses: docker/build-push-action@v4.1.1
-          # with:
-          #   context: ${{ steps.getInputs.outputs.buildContext }}
-          #   platforms: ${{ steps.getInputs.outputs.arch }}
-          #   build-args: ${{ steps.getInputs.outputs.buildArgs }}
-          #   outputs: type=docker,dest=${{ steps.getInputs.outputs.imagePath }}
-          #   cache-to: ${{ steps.getInputs.outputs.cacheTo }}
-          #   cache-from: ${{ steps.getInputs.outputs.cacheFrom }}
-          #   tags: ${{ steps.getInputs.outputs.imageIdentifier }}
