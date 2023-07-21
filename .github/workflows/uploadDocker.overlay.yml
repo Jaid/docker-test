@@ -174,7 +174,7 @@ jobs:
             core.setOutput(name, value)
             core.info(`Output ${name}: ${value}`)
           }
-          const githubRef = `${inputs.githubRegistry}/${context.payload.repository.full_name.toLowerCase()}`
+          const githubRef = `${inputs.githubRegistry}/${context.payload.repository.full_name.toLowerCase()}/${inputs.imageName}`
           setOutput(githubRef)
       - name: getDockerHubRef
         id: getDockerHubRef
@@ -182,7 +182,6 @@ jobs:
         shell: sh -c "node --input-type module < {0}"
         env:
           inputs: ${{ steps.getInputs.outputs.value }}
-          dockerHubRef: ${{ steps.getInputs.outputs.imageSlug }}
           dockerHubTokenLength: ${{ steps.getDockerHubTokenLength.outputs.value }}
         run: |
           import core from '@actions/core'
@@ -192,7 +191,7 @@ jobs:
             core.info(`Output ${name}: ${value}`)
           }
           if (process.env.dockerHubTokenLength > 0) {
-            const dockerHubRef = `${inputs.dockerHubRegistry}/${process.env.dockerHubRef}`
+            const dockerHubRef = `${inputs.dockerHubRegistry}/${inputs.imageSlug}`
             setOutput(dockerHubRef)
           }
       - name: getRefs
