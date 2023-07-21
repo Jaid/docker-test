@@ -96,26 +96,26 @@ jobs:
             setOutput(value, key)
           }
           setOutput(JSON.stringify(outputs))
-  build:
-    name: build${{ needs.getInputs.outputs.value.nameSuffix }}
-    needs: getInputs
-    uses: ./.github/workflows/buildDocker.overlay.yml
-    with:
-      id: ${{ needs.getInputs.outputs.value.matrixId }}
-      arch: ${{ needs.getInputs.outputs.value.matrixPlatform }}
-      buildContext: ${{ needs.getInputs.outputs.value.buildContext }}
-      buildArgs: ${{ needs.getInputs.outputs.value.matrixBuildArgs }}
-      imageName: ${{ needs.getInputs.outputs.value.imageName }}
   # build:
-  #   name: build${{ fromJson(needs.getInputs.outputs.value).nameSuffix }}
+  #   name: build${{ needs.getInputs.outputs.value.nameSuffix }}
   #   needs: getInputs
   #   uses: ./.github/workflows/buildDocker.overlay.yml
   #   with:
-  #     id: ${{ fromJson(needs.getInputs.outputs.value).matrixId }}
-  #     arch: ${{ fromJson(needs.getInputs.outputs.value).matrixPlatform }}
-  #     buildContext: ${{ fromJson(needs.getInputs.outputs.value).buildContext }}
-  #     buildArgs: ${{ fromJson(needs.getInputs.outputs.value).matrixBuildArgs }}
-  #     imageName: ${{ fromJson(needs.getInputs.outputs.value).imageName }}
+  #     id: ${{ needs.getInputs.outputs.value.matrixId }}
+  #     arch: ${{ needs.getInputs.outputs.value.matrixPlatform }}
+  #     buildContext: ${{ needs.getInputs.outputs.value.buildContext }}
+  #     buildArgs: ${{ needs.getInputs.outputs.value.matrixBuildArgs }}
+  #     imageName: ${{ needs.getInputs.outputs.value.imageName }}
+  build:
+    name: build${{ fromJson(needs.getInputs.outputs.value).nameSuffix }}
+    needs: getInputs
+    uses: ./.github/workflows/buildDocker.overlay.yml
+    with:
+      id: ${{ fromJson(needs.getInputs.outputs.value).matrixId }}
+      arch: ${{ fromJson(needs.getInputs.outputs.value).matrixPlatform }}
+      buildContext: ${{ fromJson(needs.getInputs.outputs.value).buildContext }}
+      buildArgs: ${{ fromJson(needs.getInputs.outputs.value).matrixBuildArgs }}
+      imageName: ${{ fromJson(needs.getInputs.outputs.value).imageName }}
   # test:
   #   if: ${{ needs.getInputs.outputs.value.matrixIsNativeArch }}
   #   name: test${{ inputs.nameSuffix }}
