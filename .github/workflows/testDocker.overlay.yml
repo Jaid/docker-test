@@ -121,6 +121,9 @@ jobs:
           if (inputs.dockerRunArgs) {
             args.push(...inputs.dockerRunArgs.split(' '))
           }
+          if (inputs.arch !== 'linux/amd64') {
+            args.push('--platform', inputs.arch)
+          }
           args.push(inputs.imageIdentifier)
           if (inputs.appArgs) {
             args.push(...inputs.appArgs.split(' '))
