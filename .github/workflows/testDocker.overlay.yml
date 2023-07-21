@@ -27,13 +27,21 @@ on:
         type: string
         required: false
         description: Name of the image artifact to save the build to
+      imageName:
+        type: string
+        required: false
+        description: Name of the image to test
+      nameSuffix:
+        type: string
+        required: false
+        description: Suffix to append to the job name
       id:
         type: string
         required: false
         description: ID of the image
 jobs:
   test:
-    name: ${{ github.job.name }}${{ inputs.id != 'default' && format(' ({0})', inputs.id) || '' }}
+    name: ${{ github.job }}${{ inputs.nameSuffix }}
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -103,7 +111,7 @@ jobs:
           if (inputs.dockerRunArgs) {
             args.push(...inputs.dockerRunArgs.split(' '))
           }
-          args.push('test')
+          args.push(inputs.imageName)
           if (inputs.appArgs) {
             args.push(...inputs.appArgs.split(' '))
           }

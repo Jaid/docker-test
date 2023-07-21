@@ -114,18 +114,24 @@ jobs:
       buildArgs: ${{ fromJson(needs.getInputs.outputs.value).matrixBuildArgs }}
       imageName: ${{ fromJson(needs.getInputs.outputs.value).imageName }}
       nameSuffix: ${{ fromJson(needs.getInputs.outputs.value).nameSuffix }}
-  # test:
-  #   if: ${{ needs.getInputs.outputs.value.matrixIsNativeArch }}
-  #   name: test${{ inputs.nameSuffix }}
-  #   needs:
-  #     - getInputs
-  #     - build
-  #   uses: ./.github/workflows/testDocker.overlay.yml
-  #   with:
-  #     id: ${{ needs.getInputs.outputs.value.matrixId }}
-  #     dockerRunArgs: ${{ needs.getInputs.outputs.value.testDockerRunArgs }}
-  #     appArgs: ${{ needs.getInputs.outputs.value.testAppArgs }}
-  #     testEval: ${{ needs.getInputs.outputs.value.testEval }}
+  test:
+    if: ${{ needs.getInputs.outputs.value.matrixIsNativeArch }}
+    name: test${{ fromJson(needs.getInputs.outputs.value).nameSuffix }}
+    needs:
+      - getInputs
+      - build
+    uses: ./.github/workflows/testDocker.overlay.yml
+    with:
+      id: ${{ fromJson(needs.getInputs.outputs.value).matrixId }}
+      dockerRunArgs: ${{ fromJson(needs.getInputs.outputs.value).testDockerRunArgs }}
+      appArgs: ${{ fromJson(needs.getInputs.outputs.value).testAppArgs }}
+      testEval: ${{ fromJson(needs.getInputs.outputs.value).testEval }}
+      imageFolder: ${{ needs.build.outputs.imageFolder }}
+      imageArtifact: ${{ needs.build.outputs.imageArtifact }}
+      imageFile: ${{ needs.build.outputs.imageFile }}
+      imageName: ${{ needs.build.outputs.imageName }}
+      nameSuffix: ${{ fromJson(needs.getInputs.outputs.value).nameSuffix }}
+
   # push:
   #   name: push${{ matrix.id && format(' ({0})', matrix.id) }}
   #   needs:

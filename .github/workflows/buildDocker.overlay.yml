@@ -83,6 +83,7 @@ jobs:
       imageFile: ${{ steps.getInputs.outputs.imageFile }}
       imageFolder: ${{ steps.getInputs.outputs.imageFolder }}
       imageArtifact: ${{ steps.getInputs.outputs.imageArtifact }}
+      imageName: ${{ steps.getInputs.outputs.imageName }}
     steps:
       - name: checkout
         uses: actions/checkout@v3.5.3
