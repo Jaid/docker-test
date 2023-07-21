@@ -115,7 +115,7 @@ jobs:
       imageName: ${{ fromJson(needs.getInputs.outputs.value).imageName }}
       nameSuffix: ${{ fromJson(needs.getInputs.outputs.value).nameSuffix }}
   test:
-    if: ${{ needs.getInputs.outputs.value.matrixIsNativeArch }}
+    if: ${{ fromJson(needs.getInputs.outputs.value).matrixIsNativeArch }}
     name: test${{ fromJson(needs.getInputs.outputs.value).nameSuffix }}
     needs:
       - getInputs
