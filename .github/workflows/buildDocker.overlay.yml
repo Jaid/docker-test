@@ -69,6 +69,8 @@ on:
         value: ${{ jobs.build.outputs.imagePath }}
       cacheHint:
         value: ${{ jobs.build.outputs.cacheHint }}
+      imageName:
+        value: ${{ jobs.build.outputs.imageName }}
 jobs:
   build:
     name: ${{ github.job }}${{ inputs.nameSuffix }}
