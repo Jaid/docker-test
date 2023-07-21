@@ -79,16 +79,16 @@ jobs:
             outputs.imageName = preventStart.default(context.payload.repository.name.toLowerCase(), 'docker-')
           }
           if (!outputs.imageUser) {
-            outputs.imageUser = github.repository.owner.login.toLowerCase()
+            outputs.imageUser = context.payload.repository.owner.login.toLowerCase()
           }
           if (!outputs.imageSlug) {
             outputs.imageSlug = `${outputs.imageUser}/${outputs.imageName}`
           }
           if (!outputs.imageArtifact) {
-            outputs.imageArtifact = `${github.run_id}_${outputs.matrixId}`
+            outputs.imageArtifact = `${context.payload.runId}_${outputs.matrixId}`
           }
           if (!outputs.imageFolder) {
-            outputs.imageFolder = `/tmp/dockerBuild/${github.run_id}_${outputs.matrixId}`
+            outputs.imageFolder = `/tmp/dockerBuild/${context.payload.runId}_${outputs.matrixId}`
           }
           if (!outputs.nameSuffix) {
             if (outputs.matrixId && outputs.matrixId !== 'default') {
