@@ -45,6 +45,11 @@ on:
         type: string
         required: false
         description: Suffix for job naming (just a visual thing)
+      tag:
+        type: string
+        required: false
+        description: Tag of the image to build
+        default: ci
       id:
         type: string
         required: false
@@ -120,7 +125,7 @@ jobs:
           if (!outputs.cacheTo) {
             outputs.cacheTo = `type=gha,scope=${outputs.cacheKey},mode=max`
           }
-          outputs.cacheHint = outputs.cacheTo.replace('mode=max', '').trim(',')
+          outputs.cacheHint = outputs.cacheTo.replace('mode=max', '').replace(/^,+/, '').replace(/,+$/, '').replace(/,+/g, ',')
           if (!outputs.imageArtifact) {
             outputs.imageArtifact = `${github.run_id}_${outputs.id}`
           }
@@ -138,10 +143,10 @@ jobs:
           }
           setOutput(JSON.stringify(outputs))
       - name: setupQemu
-        if: ${{ inputs.arch != 'linux/amd64' }}
+        if: ${{ steps.getInputs.outputs.arch != 'linux/amd64' }}
         uses: docker/setup-qemu-action@v2.2.0
         with:
-          platforms: ${{ inputs.arch }}
+          platforms: ${{ steps.getInputs.outputs.arch }}
       - name: setupBuildx
         uses: docker/setup-buildx-action@v2.8.0
       - name: ensureImageFolder
@@ -153,13 +158,13 @@ jobs:
         id: buildImage
         uses: docker/build-push-action@v4.1.1
         with:
-          context: ${{ inputs.buildContext }}
-          platforms: ${{ inputs.arch }}
-          build-args: ${{ inputs.buildArgs }}
+          context: ${{ steps.getInputs.outputs.buildContext }}
+          platforms: ${{ steps.getInputs.outputs.arch }}
+          build-args: ${{ steps.getInputs.outputs.buildArgs }}
           outputs: type=docker,dest=${{ steps.getInputs.outputs.imagePath }}
           cache-to: ${{ steps.getInputs.outputs.cacheTo }}
           cache-from: ${{ steps.getInputs.outputs.cacheFrom }}
-          tags: ${{ inputs.imageName }}:.build
+          tags: '${{ steps.getInputs.outputs.imageName }}:${{ steps.getInputs.outputs.tag }}'
       - name: saveArtifact
         if: ${{ steps.getInputs.outputs.imageArtifact }}
         uses: actions/upload-artifact@v3.1.2
