@@ -133,7 +133,8 @@ jobs:
           }
           if (!outputs.cacheFrom) {
             // outputs.cacheFrom = `type=gha,scope=${outputs.cacheKey}`
-            outputs.cacheFrom = `type=registry,ref=${outputs.imageSlug}:cache`
+            // outputs.cacheFrom = `type=registry,ref=${outputs.imageSlug}:cache`
+            outputs.cacheFrom = 'type=gha'
           }
           if (!outputs.cacheTo) {
             // outputs.cacheTo = `type=gha,scope=${outputs.cacheKey},mode=max`
