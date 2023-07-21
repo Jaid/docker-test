@@ -131,34 +131,34 @@ jobs:
       imageFile: ${{ needs.build.outputs.imageFile }}
       imageIdentifier: ${{ needs.build.outputs.imageIdentifier }}
       nameSuffix: ${{ fromJson(needs.getInputs.outputs.value).nameSuffix }}
-
-  # push:
-  #   name: push${{ matrix.id && format(' ({0})', matrix.id) }}
-  #   needs:
-  #     - getDockerImageName
-  #     - makeMatrix
-  #     - test
-  #     - build
-  #   permissions:
-  #     packages: write
-  #   strategy:
-  #     matrix:
-  #       include: ${{ fromJson(needs.makeMatrix.outputs.output) }}
-  #   uses: ./.github/workflows/uploadDocker.overlay.yml
-  #   with:
-  #     id: ${{ matrix.id }}
-  #     dockerHubUser: ${{ inputs.dockerHubUser }}
-  #     dockerHubRegistry: ${{ inputs.dockerHubRegistry }}
-  #     githubRegistry: ${{ inputs.githubRegistry }}
-  #     baseTags: ${{ inputs.baseTags }}
-  #     addShaTags: ${{ inputs.addShaTags }}
-  #     addScheduleTags: ${{ inputs.addScheduleTags }}
-  #     addVersionTag: ${{ inputs.addVersionTag }}
-  #     versionTagPrefix: ${{ inputs.versionTagPrefix }}
-  #     additionalTags: ${{ inputs.additionalTags }}
-  #     versionTag: ${{ inputs.versionTag }}
-  #     versionTagSemverPrefix: ${{ inputs.versionTagSemverPrefix }}
-  #     flavorLatest: ${{ inputs.flavorLatest }}
-  #     flavorPrefix: ${{ inputs.flavorPrefix }}
-  #     flavorSuffix: ${{ inputs.flavorSuffix }}
-  #     flavorConnectionString: ${{ inputs.flavorConnectionString }}
+  push:
+    name: push${{ fromJson(needs.getInputs.outputs.value).nameSuffix }}
+    needs:
+      - getInputs
+      - build
+      - test
+    permissions:
+      packages: write
+    uses: ./.github/workflows/uploadDocker.overlay.yml
+    with:
+      id: ${{ fromJson(needs.getInputs.outputs.value).matrixId }}
+      dockerHubUser: ${{ fromJson(needs.getInputs.outputs.value).dockerHubUser }}
+      dockerHubRegistry: ${{ fromJson(needs.getInputs.outputs.value).dockerHubRegistry }}
+      githubRegistry: ${{ fromJson(needs.getInputs.outputs.value).githubRegistry }}
+      baseTags: ${{ fromJson(needs.getInputs.outputs.value).baseTags }}
+      addShaTags: ${{ fromJson(needs.getInputs.outputs.value).addShaTags }}
+      addScheduleTags: ${{ fromJson(needs.getInputs.outputs.value).addScheduleTags }}
+      addVersionTag: ${{ fromJson(needs.getInputs.outputs.value).addVersionTag }}
+      versionTagPrefix: ${{ fromJson(needs.getInputs.outputs.value).versionTagPrefix }}
+      additionalTags: ${{ fromJson(needs.getInputs.outputs.value).additionalTags }}
+      versionTag: ${{ fromJson(needs.getInputs.outputs.value).versionTag }}
+      versionTagSemverPrefix: ${{ fromJson(needs.getInputs.outputs.value).versionTagSemverPrefix }}
+      flavorLatest: ${{ fromJson(needs.getInputs.outputs.value).flavorLatest }}
+      flavorPrefix: ${{ fromJson(needs.getInputs.outputs.value).flavorPrefix }}
+      flavorSuffix: ${{ fromJson(needs.getInputs.outputs.value).flavorSuffix }}
+      flavorConnectionString: ${{ fromJson(needs.getInputs.outputs.value).flavorConnectionString }}
+      cacheFrom: ${{ needs.build.outputs.cacheHint }}
+      imageSlug: ${{ fromJson(needs.getInputs.outputs.value).imageSlug }}
+      imageName: ${{ needs.build.outputs.imageName }}
+    secrets:
+      dockerHubToken: ${{ secrets.dockerHubToken }}

@@ -131,12 +131,6 @@ on:
       imageUser:
         value: ${{ jobs.push.outputs.imageUser }}
 jobs:
-  # getDockerImageName:
-  #   name: getDockerImageName
-  #   uses: ./.github/workflows/getDockerImageName.overlay.yml
-  #   with:
-  #     dockerHubUser: ${{ inputs.dockerHubUser }}
-  #     imageName: ${{ inputs.imageName }}
   makeMatrix:
     name: makeMatrix
     uses: ./.github/workflows/makeDockerTagMatrix.overlay.yml
