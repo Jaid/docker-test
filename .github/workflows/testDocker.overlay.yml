@@ -35,6 +35,11 @@ on:
         type: string
         required: false
         description: Suffix to append to the job name
+      arch:
+        type: string
+        required: false
+        description: Architecture to test
+        default: linux/amd64
       id:
         type: string
         required: false
@@ -96,6 +101,11 @@ jobs:
           imageFile: ${{ steps.getInputs.outputs.imageFile }}
         run: |
             docker load --input "$imageFolder/$imageFile"
+      - name: setupQemu
+        if: ${{ steps.getInputs.outputs.arch != 'linux/amd64' }}
+        uses: docker/setup-qemu-action@v2.2.0
+        with:
+          platforms: ${{ steps.getInputs.outputs.arch }}
       - id: runImage
         shell: sh -c "node --input-type module < {0}"
         env:

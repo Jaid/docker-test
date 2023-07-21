@@ -117,14 +117,12 @@ jobs:
         shell: sh -c "node --input-type module < {0}"
         env:
           inputs: ${{ toJSON(inputs) }}
-          github: ${{ toJSON(github) }}
         run: |
           import core from '@actions/core'
           import sortKeys from 'sort-keys'
           import {camelCase, omit} from 'lodash-es'
           const inputs = JSON.parse(process.env.inputs)
           const buildOutput = JSON.parse(inputs.buildOutput)
-          const github = JSON.parse(process.env.github)
           const setOutput = (value, name = 'value') => {
             core.setOutput(name, value)
             core.info(`Output ${name}: ${value}`)
