@@ -28,4 +28,4 @@ COPY --from=build /bin/hyperfine /bin/hyperfine
 COPY --from=build /bin/smileypyramid /bin/smileypyramid
 ADD *.bash /bin
 RUN bash /bin/init.bash
-ENTRYPOINT ["/bin/bash", "-o", "errexit", "-o", "pipefail", "-o", "xtrace", "/bin/entrypoint.bash"]
+ENTRYPOINT ["/bin/tini", "--", "/bin/bash", "-o", "errexit", "-o", "pipefail", "-o", "xtrace", "/bin/entrypoint.bash"]
