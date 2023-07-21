@@ -174,7 +174,7 @@ jobs:
             core.setOutput(name, value)
             core.info(`Output ${name}: ${value}`)
           }
-          const githubRef = `${inputs.githubRegistry}/${context.payload.repository.full_name.toLowerCase()}/${inputs.imageName}`
+          const githubRef = `${inputs.githubRegistry}/${context.payload.repository.full_name.toLowerCase()}/${inputs.buildImageName}`
           setOutput(githubRef)
       - name: getDockerHubRef
         id: getDockerHubRef
