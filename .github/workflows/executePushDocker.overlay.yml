@@ -41,27 +41,26 @@ jobs:
           node-version: latest
       - name: installNodePackages
         shell: bash
-        run: npm install --no-save --no-package-lock @actions/core lodash-es sort-keys prevent-start
+        run: npm install --no-save --no-package-lock @actions/core @actions/github lodash-es sort-keys prevent-start
       - id: getInputs
         name: getInputs
         shell: sh -c "node --input-type module < {0}"
         env:
           inputs: ${{ toJson(inputs) }}
-          github: ${{ toJSON(github) }}
         run: |
           import core from '@actions/core'
+          import { context } from '@actions/github'
           import sortKeys from 'sort-keys'
           import {camelCase, omit} from 'lodash-es'
           import preventStart from 'prevent-start'
           const inputs = JSON.parse(process.env.inputs)
           const passedInputs = JSON.parse(inputs.passedInputs)
           const matrixEntry = JSON.parse(inputs.matrixEntry)
-          const github = JSON.parse(process.env.github)
           console.dir({
             inputs,
             passedInputs,
             matrixEntry,
-            github
+            context
           })
           const setOutput = (value, name = 'value') => {
             core.setOutput(name, value)
@@ -77,7 +76,7 @@ jobs:
             outputs[exclusiveKey] = value
           }
           if (!outputs.imageName) {
-            outputs.imageName = preventStart.default(github.repository.name.toLowerCase(), 'docker-')
+            outputs.imageName = preventStart.default(context.payload.repository.name.toLowerCase(), 'docker-')
           }
           if (!outputs.imageUser) {
             outputs.imageUser = github.repository.owner.login.toLowerCase()
