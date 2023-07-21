@@ -320,17 +320,6 @@ jobs:
             latest=${{ steps.getInputs.outputs.flavorLatest }}
             prefix=${{ steps.getInputs.outputs.flavorPrefix && format('{0}{1}', steps.getInputs.outputs.flavorPrefix, steps.getInputs.outputs.flavorConnectionString) || '' }}
             suffix=${{ steps.getInputs.outputs.flavorSuffix && format('{0}{1}', steps.getInputs.outputs.flavorConnectionString, steps.getInputs.outputs.flavorSuffix) || '' }}
-      # - name: loadArtifact
-      #   uses: actions/download-artifact@v3.0.2
-      #   with:
-      #     name: ${{ steps.getInputs.outputs.buildImageArtifact }}
-      #     path: ${{ steps.getInputs.outputs.buildImageFolder }}
-      # - name: loadImage
-      #   shell: bash
-      #   env:
-      #     imagePath: ${{ steps.getInputs.outputs.buildImagePath }}
-      #   run: |
-      #       docker load --input "$imagePath"
       - name: setupQemu
         if: ${{ steps.getInputs.outputs.arch != 'linux/amd64' }}
         uses: docker/setup-qemu-action@v2.2.0
@@ -338,6 +327,8 @@ jobs:
           platforms: ${{ steps.getInputs.outputs.arch }}
       - name: setupBuildx
         uses: docker/setup-buildx-action@v2.9.1
+        with:
+          platforms: ${{ steps.getInputs.outputs.arch }}
       - name: dockerPush
         id: dockerPush
         uses: docker/build-push-action@v4.1.1
