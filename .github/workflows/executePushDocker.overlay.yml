@@ -100,7 +100,8 @@ jobs:
     needs: getInputs
     uses: ./.github/workflows/buildDocker.overlay.yml
     with:
-      id: ${{ fromJson(needs.getInputs.outputs.value).matrixId }}
+      # id: ${{ fromJson(needs.getInputs.outputs.value).matrixId }}
+      id: ${{ toJson(needs.getInputs) }}
       arch: ${{ fromJson(needs.getInputs.outputs.value).matrixArch }}
       buildContext: ${{ fromJson(needs.getInputs.outputs.value).buildContext }}
       buildArgs: ${{ fromJson(needs.getInputs.outputs.value).matrixBuildArgs }}
