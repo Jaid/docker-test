@@ -66,7 +66,7 @@ jobs:
         run: |
           import core from '@actions/core'
           import sortKeys from 'sort-keys'
-          import {camelCase} from 'lodash-es'
+          import {camelCase, omit} from 'lodash-es'
           const inputs = JSON.parse(process.env.inputs)
           const passedInputs = JSON.parse(inputs.passedInputs)
           const matrixEntry = JSON.parse(inputs.matrixEntry)
@@ -76,6 +76,7 @@ jobs:
             core.info(`Output ${name}: ${value}`)
           }
           const outputs = {
+            ...omit(inputs, ['passedInputs', 'matrixEntry']),
             ...passedInputs
           }
           for (const [key, value] of Object.entries(matrixEntry)) {
