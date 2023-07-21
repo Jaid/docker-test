@@ -1,9 +1,0 @@
-name: debug
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
-jobs:
-  job:
-    uses: ./.github/workflows/debug.overlay.yml

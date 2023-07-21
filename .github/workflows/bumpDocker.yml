@@ -13,8 +13,9 @@ on:
           - major
 jobs:
   debug:
-    uses: ./.github/workflows/pushDocker.overlay.yml
-  bump:
+    uses: ./.github/workflows/debug.overlay.yml
+  job:
+    name: ${{ github.workflow }}
     permissions:
       contents: write
     uses: jaid/workflows/.github/workflows/bump.yml@main
