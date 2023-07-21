@@ -76,22 +76,18 @@ on:
         type: string
         required: false
         description: Suffix to append to the job name
-      cacheFrom:
-        type: string
-        required: false
-        description: Cache source
       imageSlug:
         type: string
         required: false
         description: Slug of the image
-      imageName:
-        type: string
-        required: false
-        description: Name of the image
       id:
         type: string
         required: false
         description: ID of the image
+      buildOutput:
+        type: string
+        required: true
+        description: Output of the build job in JSON
     secrets:
       dockerHubToken:
         required: false
@@ -111,7 +107,7 @@ jobs:
           node-version: latest
       - name: installNodePackages
         shell: bash
-        run: npm install --no-save --no-package-lock @actions/core @actions/github read-file-string
+        run: npm install --no-save --no-package-lock @actions/core @actions/github read-file-string lodash-es sort-keys
       - id: getInputs
         shell: sh -c "node --input-type module < {0}"
         env:
@@ -119,19 +115,26 @@ jobs:
           github: ${{ toJSON(github) }}
         run: |
           import core from '@actions/core'
+          import sortKeys from 'sort-keys'
+          import {camelCase, omit} from 'lodash-es'
           const inputs = JSON.parse(process.env.inputs)
+          const buildOutput = JSON.parse(inputs.buildOutput)
           const github = JSON.parse(process.env.github)
           const setOutput = (value, name = 'value') => {
             core.setOutput(name, value)
             core.info(`Output ${name}: ${value}`)
           }
           const outputs = {
-            ...inputs
+            ...omit(inputs, ['buildOutput']),
+          }
+          for (const [key, value] of Object.entries(buildOutput)) {
+            const exclusiveKey = camelCase(`build ${key}`)
+            outputs[exclusiveKey] = value
           }
           if (!outputs.id) {
             outputs.id = 'default'
           }
-          for (const [key, value] of Object.entries(outputs)) {
+          for (const [key, value] of Object.entries(sortKeys(outputs))) {
             setOutput(value, key)
           }
           setOutput(JSON.stringify(outputs))
@@ -309,7 +312,19 @@ jobs:
         id: dockerPush
         uses: docker/build-push-action@v4.1.1
         with:
+          push: true
           platforms: ${{ steps.getInputs.outputs.arch }}
           tags: ${{ steps.extractDockerMetadata.outputs.tags }}
           labels: ${{ steps.extractDockerMetadata.outputs.labels }}
-          push: true
+          cache-from: ${{ steps.getInputs.outputs.cacheFrom }}
+          # - name: buildImage
+          # id: buildImage
+          # uses: docker/build-push-action@v4.1.1
+          # with:
+          #   context: ${{ steps.getInputs.outputs.buildContext }}
+          #   platforms: ${{ steps.getInputs.outputs.arch }}
+          #   build-args: ${{ steps.getInputs.outputs.buildArgs }}
+          #   outputs: type=docker,dest=${{ steps.getInputs.outputs.imagePath }}
+          #   cache-to: ${{ steps.getInputs.outputs.cacheTo }}
+          #   cache-from: ${{ steps.getInputs.outputs.cacheFrom }}
+          #   tags: ${{ steps.getInputs.outputs.imageIdentifier }}

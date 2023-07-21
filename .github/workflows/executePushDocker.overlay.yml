@@ -157,8 +157,8 @@ jobs:
       flavorPrefix: ${{ fromJson(needs.getInputs.outputs.value).flavorPrefix }}
       flavorSuffix: ${{ fromJson(needs.getInputs.outputs.value).flavorSuffix }}
       flavorConnectionString: ${{ fromJson(needs.getInputs.outputs.value).flavorConnectionString }}
-      cacheFrom: ${{ needs.build.outputs.cacheHint }}
       imageSlug: ${{ fromJson(needs.getInputs.outputs.value).imageSlug }}
-      imageName: ${{ needs.build.outputs.imageName }}
+      arch: ${{ fromJson(needs.getInputs.outputs.value).matrixPlatform }}
+      buildOutput: ${{ toJson(needs.build.outputs) }}
     secrets:
       dockerHubToken: ${{ secrets.dockerHubToken }}
