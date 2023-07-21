@@ -13,7 +13,8 @@ jobs:
       packages: write
     with:
       dockerHubUser: jaidchen
-      # matrixPlatform: linux/amd64 linux/arm64/v8
+      matrixPlatform: linux/amd64 linux/arm64/v8
+      matrixBases: a b
       testEval: stdout.length > 0
     secrets:
       dockerHubToken: ${{ secrets.dockerHubToken }}
