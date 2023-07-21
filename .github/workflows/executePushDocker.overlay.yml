@@ -33,7 +33,7 @@ jobs:
     name: getInputs${{ inputs.nameSuffix }}
     runs-on: ubuntu-latest
     outputs:
-      value: ${{ fromJson(steps.getInputs.outputs.value) }}
+      value: ${{ steps.getInputs.outputs.value }}
     steps:
       - name: setupNode
         uses: actions/setup-node@v3.7.0
