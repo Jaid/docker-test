@@ -159,7 +159,7 @@ jobs:
       versionTagSemverPrefix: ${{ fromJson(needs.getInputs.outputs.value).versionTagSemverPrefix }}
       flavorLatest: ${{ fromJson(needs.getInputs.outputs.value).flavorLatest }}
       flavorPrefix: ${{ fromJson(needs.getInputs.outputs.value).flavorPrefix }}
-      flavorSuffix: ${{ fromJson(needs.getInputs.outputs.value).flavorSuffix }}
+      flavorSuffix: ${{ fromJson(needs.getInputs.outputs.value).matrixFlavor || fromJson(needs.getInputs.outputs.value).flavorSuffix }}
       flavorConnectionString: ${{ fromJson(needs.getInputs.outputs.value).flavorConnectionString }}
       imageSlug: ${{ fromJson(needs.getInputs.outputs.value).imageSlug }}
       arch: ${{ fromJson(needs.getInputs.outputs.value).matrixPlatform }}

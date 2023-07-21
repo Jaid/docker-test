@@ -44,6 +44,7 @@ jobs:
           cd
           npm install --no-save --no-package-lock @actions/core vm2 super-regex js-yaml
       - id: makeMatrix
+        name: makeMatrix
         shell: sh -c "node --input-type module < {0}"
         env:
           inputs: ${{ toJSON(inputs) }}
