@@ -57,6 +57,12 @@ jobs:
           const passedInputs = JSON.parse(inputs.passedInputs)
           const matrixEntry = JSON.parse(inputs.matrixEntry)
           const github = JSON.parse(process.env.github)
+          console.dir({
+            inputs,
+            passedInputs,
+            matrixEntry,
+            github
+          })
           const setOutput = (value, name = 'value') => {
             core.setOutput(name, value)
             core.info(`Output ${name}: ${value}`)
