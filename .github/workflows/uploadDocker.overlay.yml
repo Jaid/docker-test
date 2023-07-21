@@ -88,6 +88,10 @@ on:
         type: string
         required: true
         description: Output of the build job in JSON
+      title:
+        type: string
+        required: false
+        description: Title of the image
     secrets:
       dockerHubToken:
         required: false
@@ -109,6 +113,7 @@ jobs:
         shell: bash
         run: npm install --no-save --no-package-lock @actions/core @actions/github read-file-string lodash-es sort-keys
       - id: getInputs
+        name: getInputs
         shell: sh -c "node --input-type module < {0}"
         env:
           inputs: ${{ toJSON(inputs) }}
@@ -133,6 +138,13 @@ jobs:
           }
           if (!outputs.id) {
             outputs.id = 'default'
+          }
+          if (!outputs.title) {
+            if (outputs.id === 'default') {
+              outputs.title = buildOutput.name
+            } else {
+              outputs.title = `${buildOutput.name} (${outputs.id})`
+            }
           }
           for (const [key, value] of Object.entries(sortKeys(outputs))) {
             setOutput(value, key)
@@ -302,7 +314,7 @@ jobs:
           labels: |
             maintainer=${{ github.actor }}
             org.opencontainers.image.vendor=${{ github.actor }}
-            org.opencontainers.image.title=${{ steps.getInputs.outputs.imageName }}
+            org.opencontainers.image.title=${{ steps.getInputs.outputs.title }}
           tags: ${{ steps.getTags.outputs.tags }}
           flavor: |
             latest=${{ steps.getInputs.outputs.flavorLatest }}
@@ -317,6 +329,7 @@ jobs:
           tags: ${{ steps.extractDockerMetadata.outputs.tags }}
           labels: ${{ steps.extractDockerMetadata.outputs.labels }}
           cache-from: ${{ steps.getInputs.outputs.cacheFrom }}
+          context: ${{ steps.getInputs.outputs.buildContext }}
           # - name: buildImage
           # id: buildImage
           # uses: docker/build-push-action@v4.1.1
