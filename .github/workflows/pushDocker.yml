@@ -5,6 +5,14 @@ on:
       - main
   schedule:
     - cron: 45 23 * * 0 # https://crontab.guru/#45_23_*_*_0
+  workflow_call:
+    inputs:
+      versionTag:
+        type: string
+        required: false
+  release:
+    types:
+      - released
 jobs:
   job:
     uses: ./.github/workflows/pushDocker.overlay.yml
@@ -20,5 +28,6 @@ jobs:
         const platformSegment = platformShortcuts[platform] ?? platform.replaceAll('/', '_');
         [baseSegment, platformSegment].filter(part => part?.length).join('-')
       testEval: stdout.length > 0
+      versionTag: ${{ github.event.release.tag_name }}
     secrets:
       dockerHubToken: ${{ secrets.dockerHubToken }}

@@ -3,7 +3,7 @@ on:
   workflow_call: {}
 jobs:
   job:
-    name: debug
+    name: debug (${{ github.event_name }})
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
