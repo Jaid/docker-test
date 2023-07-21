@@ -129,7 +129,7 @@ jobs:
       imageFolder: ${{ needs.build.outputs.imageFolder }}
       imageArtifact: ${{ needs.build.outputs.imageArtifact }}
       imageFile: ${{ needs.build.outputs.imageFile }}
-      imageName: ${{ needs.build.outputs.imageName }}
+      imageIdentifier: ${{ needs.build.outputs.imageIdentifier }}
       nameSuffix: ${{ fromJson(needs.getInputs.outputs.value).nameSuffix }}
 
   # push:

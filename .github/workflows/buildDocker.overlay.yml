@@ -71,6 +71,8 @@ on:
         value: ${{ jobs.build.outputs.cacheHint }}
       imageName:
         value: ${{ jobs.build.outputs.imageName }}
+      imageIdentifier:
+        value: ${{ jobs.build.outputs.imageIdentifier }}
 jobs:
   build:
     name: ${{ github.job }}${{ inputs.nameSuffix }}
@@ -86,6 +88,7 @@ jobs:
       imageFolder: ${{ steps.getInputs.outputs.imageFolder }}
       imageArtifact: ${{ steps.getInputs.outputs.imageArtifact }}
       imageName: ${{ steps.getInputs.outputs.imageName }}
+      imageIdentifier: ${{ steps.getInputs.outputs.imageIdentifier }}
     steps:
       - name: checkout
         uses: actions/checkout@v3.5.3
@@ -141,6 +144,9 @@ jobs:
           if (!outputs.imagePath) {
             outputs.imagePath = path.resolve(outputs.imageFolder, outputs.imageFile)
           }
+          if (!outputs.imageIdentifier) {
+            outputs.imageIdentifier = `${outputs.imageName}:${outputs.tag}`
+          }
           for (const [key, value] of Object.entries(outputs)) {
             setOutput(value, key)
           }
@@ -167,7 +173,7 @@ jobs:
           outputs: type=docker,dest=${{ steps.getInputs.outputs.imagePath }}
           cache-to: ${{ steps.getInputs.outputs.cacheTo }}
           cache-from: ${{ steps.getInputs.outputs.cacheFrom }}
-          tags: '${{ steps.getInputs.outputs.imageName }}:${{ steps.getInputs.outputs.tag }}'
+          tags: ${{ steps.getInputs.outputs.imageIdentifier }}
       - name: saveArtifact
         if: ${{ steps.getInputs.outputs.imageArtifact }}
         uses: actions/upload-artifact@v3.1.2

@@ -27,10 +27,10 @@ on:
         type: string
         required: false
         description: Name of the image artifact to save the build to
-      imageName:
+      imageIdentifier:
         type: string
         required: false
-        description: Name of the image to test
+        description: Name and tag of the image to test
       nameSuffix:
         type: string
         required: false
@@ -111,7 +111,7 @@ jobs:
           if (inputs.dockerRunArgs) {
             args.push(...inputs.dockerRunArgs.split(' '))
           }
-          args.push(inputs.imageName)
+          args.push(inputs.imageIdentifier)
           if (inputs.appArgs) {
             args.push(...inputs.appArgs.split(' '))
           }
