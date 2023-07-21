@@ -10,22 +10,6 @@ on:
         type: string
         required: true
         description: JSON object containing all matrix values
-      nameSuffix:
-        type: string
-        required: false
-        description: Suffix for job naming (just a visual thing)
-      imageName:
-        type: string
-        required: true
-        description: Name of the Docker image
-      imageUser:
-        type: string
-        required: true
-        description: Docker Hub user or organization
-      imageSlug:
-        type: string
-        required: false
-        description: Slug of the Docker image
     secrets:
       dockerHubToken:
         required: false
@@ -49,7 +33,7 @@ jobs:
     name: getInputs${{ inputs.nameSuffix }}
     runs-on: ubuntu-latest
     outputs:
-      value: ${{ steps.getInputs.outputs.value }}
+      value: ${{ fromJson(steps.getInputs.outputs.value) }}
     steps:
       - name: setupNode
         uses: actions/setup-node@v3.7.0
@@ -57,7 +41,7 @@ jobs:
           node-version: latest
       - name: installNodePackages
         shell: bash
-        run: npm install --no-save --no-package-lock @actions/core lodash-es sort-keys
+        run: npm install --no-save --no-package-lock @actions/core lodash-es sort-keys prevent-start
       - id: getInputs
         name: getInputs
         shell: sh -c "node --input-type module < {0}"
@@ -68,6 +52,7 @@ jobs:
           import core from '@actions/core'
           import sortKeys from 'sort-keys'
           import {camelCase, omit} from 'lodash-es'
+          import preventStart from 'prevent-start'
           const inputs = JSON.parse(process.env.inputs)
           const passedInputs = JSON.parse(inputs.passedInputs)
           const matrixEntry = JSON.parse(inputs.matrixEntry)
@@ -85,6 +70,12 @@ jobs:
             const exclusiveKey = camelCase(`matrix ${key}`)
             outputs[exclusiveKey] = value
           }
+          if (!outputs.imageName) {
+            outputs.imageName = preventStart.default(github.repository.name.toLowerCase(), 'docker-')
+          }
+          if (!outputs.imageUser) {
+            outputs.imageUser = github.repository.owner.login.toLowerCase()
+          }
           if (!outputs.imageSlug) {
             outputs.imageSlug = `${outputs.imageUser}/${outputs.imageName}`
           }
@@ -94,20 +85,37 @@ jobs:
           if (!outputs.imageFolder) {
             outputs.imageFolder = `/tmp/dockerBuild/${github.run_id}_${outputs.matrixId}`
           }
+          if (!outputs.nameSuffix) {
+            if (outputs.matrixId && outputs.matrixId !== 'default') {
+              outputs.nameSuffix = ` (${outputs.matrixId})`
+            } else {
+              outputs.nameSuffix = ''
+            }
+          }
           for (const [key, value] of Object.entries(sortKeys(outputs))) {
             setOutput(value, key)
           }
           setOutput(JSON.stringify(outputs))
   build:
-    name: build${{ inputs.nameSuffix }}
+    name: build${{ needs.getInputs.outputs.value.nameSuffix }}
     needs: getInputs
     uses: ./.github/workflows/buildDocker.overlay.yml
     with:
-      id: ${{ fromJson(needs.getInputs.outputs.value).matrixId }}
-      arch: ${{ fromJson(needs.getInputs.outputs.value).matrixPlatform }}
-      buildContext: ${{ fromJson(needs.getInputs.outputs.value).buildContext }}
-      buildArgs: ${{ fromJson(needs.getInputs.outputs.value).matrixBuildArgs }}
-      imageName: ${{ fromJson(needs.getInputs.outputs.value).imageName }}
+      id: ${{ needs.getInputs.outputs.value.matrixId }}
+      arch: ${{ needs.getInputs.outputs.value.matrixPlatform }}
+      buildContext: ${{ needs.getInputs.outputs.value.buildContext }}
+      buildArgs: ${{ needs.getInputs.outputs.value.matrixBuildArgs }}
+      imageName: ${{ needs.getInputs.outputs.value.imageName }}
+  # build:
+  #   name: build${{ fromJson(needs.getInputs.outputs.value).nameSuffix }}
+  #   needs: getInputs
+  #   uses: ./.github/workflows/buildDocker.overlay.yml
+  #   with:
+  #     id: ${{ fromJson(needs.getInputs.outputs.value).matrixId }}
+  #     arch: ${{ fromJson(needs.getInputs.outputs.value).matrixPlatform }}
+  #     buildContext: ${{ fromJson(needs.getInputs.outputs.value).buildContext }}
+  #     buildArgs: ${{ fromJson(needs.getInputs.outputs.value).matrixBuildArgs }}
+  #     imageName: ${{ fromJson(needs.getInputs.outputs.value).imageName }}
   # test:
   #   if: ${{ needs.getInputs.outputs.value.matrixIsNativeArch }}
   #   name: test${{ inputs.nameSuffix }}
