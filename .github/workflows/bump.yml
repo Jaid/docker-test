@@ -1,4 +1,4 @@
-name: bumpDocker
+name: bump
 on:
   workflow_dispatch:
     inputs:
