@@ -41,7 +41,7 @@ on:
         description: ID of the image
 jobs:
   test:
-    name: ${{ github.job }}${{ inputs.nameSuffix }}
+    name: test${{ inputs.nameSuffix }}
     runs-on: ubuntu-latest
     steps:
       - name: checkout

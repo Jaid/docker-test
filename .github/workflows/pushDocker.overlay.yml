@@ -150,5 +150,6 @@ jobs:
     with:
       passedInputs: ${{ toJson(inputs) }}
       matrixEntry: ${{ toJson(matrix) }}
+      nameSuffix: ${{ matrix.id != 'default' && format(' ({0})', matrix.id) || '' }}
     secrets:
       dockerHubToken: ${{ secrets.dockerHubToken }}

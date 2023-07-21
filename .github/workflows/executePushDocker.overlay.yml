@@ -10,6 +10,10 @@ on:
         type: string
         required: true
         description: JSON object containing all matrix values
+      nameSuffix:
+        type: string
+        required: false
+        description: Suffix to append to job names
     secrets:
       dockerHubToken:
         required: false
@@ -131,8 +135,8 @@ jobs:
       imageFile: ${{ needs.build.outputs.imageFile }}
       imageIdentifier: ${{ needs.build.outputs.imageIdentifier }}
       nameSuffix: ${{ fromJson(needs.getInputs.outputs.value).nameSuffix }}
-  push:
-    name: push${{ fromJson(needs.getInputs.outputs.value).nameSuffix }}
+  upload:
+    name: upload${{ fromJson(needs.getInputs.outputs.value).nameSuffix }}
     needs:
       - getInputs
       - build

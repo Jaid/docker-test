@@ -79,7 +79,7 @@ on:
         value: ${{ jobs.build.outputs.buildArgs }}
 jobs:
   build:
-    name: ${{ github.job }}${{ inputs.nameSuffix }}
+    name: build${{ inputs.nameSuffix }}
     runs-on: ubuntu-latest
     permissions:
       contents: read

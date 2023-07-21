@@ -98,7 +98,7 @@ on:
         description: 'Create here with “Read, Write”: https://hub.docker.com/settings/security?generateToken=true'
 jobs:
   upload:
-    name: ${{ github.job }}${{ inputs.nameSuffix }}
+    name: upload${{ inputs.nameSuffix }}
     runs-on: ubuntu-latest
     permissions:
       packages: write

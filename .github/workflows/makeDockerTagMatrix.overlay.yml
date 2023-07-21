@@ -59,7 +59,7 @@ jobs:
             core.info(`Output ${name}: ${value}`)
           }
           const flavorEval = inputs.flavorEval || `[
-            baseShortcuts[base],
+            baseShortcuts[base] ?? base,
             platformShortcuts[platform] ?? platform.replaceAll('/', '_')
           ].filter(part => part?.length).join('-')`
 
