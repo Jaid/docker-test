@@ -101,7 +101,7 @@ jobs:
     uses: ./.github/workflows/buildDocker.overlay.yml
     with:
       id: ${{ fromJson(needs.getInputs.outputs.value).matrixId }}
-      arch: ${{ fromJson(needs.getInputs.outputs.value).matrixArch }}
+      arch: ${{ fromJson(needs.getInputs.outputs.value).matrixPlatform }}
       buildContext: ${{ fromJson(needs.getInputs.outputs.value).buildContext }}
       buildArgs: ${{ fromJson(needs.getInputs.outputs.value).matrixBuildArgs }}
       imageName: ${{ fromJson(needs.getInputs.outputs.value).imageName }}

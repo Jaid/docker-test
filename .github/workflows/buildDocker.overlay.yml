@@ -41,11 +41,10 @@ on:
         type: string
         required: true
         description: Name of the image to build
-      jobName:
+      nameSuffix:
         type: string
         required: false
-        description: Name of the job to run
-        default: ${{ github.workflow }}${{ inputs.id && inputs.id != 'default' && format(' ({0})', inputs.id)}}
+        description: Suffix for job naming (just a visual thing)
       id:
         type: string
         required: false
@@ -67,7 +66,7 @@ on:
         value: ${{ jobs.build.outputs.cacheHint }}
 jobs:
   build:
-    name: ${{ github.job }}
+    name: ${{ github.job }}${{ inputs.nameSuffix }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -75,7 +74,7 @@ jobs:
       inputs: ${{ steps.getInputs.outputs.value }}
       cacheHint: ${{ steps.getInputs.outputs.cacheHint }}
       meta: ${{ steps.buildImage.outputs.metadata }}
-      imagePath: ${{ steps.getImagePath.outputs.value }}
+      imagePath: ${{ steps.getInputs.outputs.imagePath }}
       imageFile: ${{ steps.getInputs.outputs.imageFile }}
       imageFolder: ${{ steps.getInputs.outputs.imageFolder }}
       imageArtifact: ${{ steps.getInputs.outputs.imageArtifact }}
@@ -99,6 +98,7 @@ jobs:
           github: ${{ toJSON(github) }}
         run: |
           import core from '@actions/core'
+          import path from 'path'
           const inputs = JSON.parse(process.env.inputs)
           const github = JSON.parse(process.env.github)
           const setOutput = (value, name = 'value') => {
@@ -121,14 +121,17 @@ jobs:
             outputs.cacheTo = `type=gha,scope=${outputs.cacheKey},mode=max`
           }
           outputs.cacheHint = outputs.cacheTo.replace('mode=max', '').trim(',')
-          if (!outputs.imageFile) {
-            outputs.imageFile = `${outputs.imageName}.tar`
-          }
           if (!outputs.imageArtifact) {
             outputs.imageArtifact = `${github.run_id}_${outputs.id}`
           }
+          if (!outputs.imageFile) {
+            outputs.imageFile = `${outputs.imageName}.tar`
+          }
           if (!outputs.imageFolder) {
             outputs.imageFolder = `/tmp/dockerBuild/${github.run_id}_${outputs.id}`
+          }
+          if (!outputs.imagePath) {
+            outputs.imagePath = path.resolve(outputs.imageFolder, outputs.imageFile)
           }
           for (const [key, value] of Object.entries(outputs)) {
             setOutput(value, key)
@@ -146,20 +149,6 @@ jobs:
         env:
           imageFolder: ${{ steps.getInputs.outputs.imageFolder }}
         run: mkdir --parents "$imageFolder"
-      - id: getImagePath
-        shell: sh -c "node --input-type module < {0}"
-        env:
-          inputs: ${{ steps.getInputs.outputs.value }}
-        run: |
-          import core from '@actions/core'
-          import path from 'path'
-          const inputs = JSON.parse(process.env.inputs)
-          const setOutput = (value, name = 'value') => {
-            core.setOutput(name, value)
-            core.info(`Output ${name}: ${value}`)
-          }
-          const imagePath = path.resolve(inputs.imageFolder, inputs.imageFile)
-          setOutput(imagePath)
       - name: buildImage
         id: buildImage
         uses: docker/build-push-action@v4.1.1
@@ -167,7 +156,7 @@ jobs:
           context: ${{ inputs.buildContext }}
           platforms: ${{ inputs.arch }}
           build-args: ${{ inputs.buildArgs }}
-          outputs: type=docker,dest=${{ steps.getImagePath.outputs.value }}
+          outputs: type=docker,dest=${{ steps.getInputs.outputs.imagePath }}
           cache-to: ${{ steps.getInputs.outputs.cacheTo }}
           cache-from: ${{ steps.getInputs.outputs.cacheFrom }}
           tags: ${{ inputs.imageName }}:.build
