@@ -11,9 +11,7 @@ on:
         type: string
         required: false
   release:
-    types:
-      - released
-      - created
+    types: released
 jobs:
   debug:
     uses: ./.github/workflows/debug.overlay.yml
