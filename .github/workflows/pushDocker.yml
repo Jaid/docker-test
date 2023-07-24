@@ -11,7 +11,13 @@ on:
         type: string
         required: false
   release:
-    types: created
+    types:
+      - created
+      - published
+      - edited
+      - deleted
+      - prereleased
+      - released
 jobs:
   debug:
     uses: ./.github/workflows/debug.overlay.yml
