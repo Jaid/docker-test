@@ -4,11 +4,9 @@ on:
       dockerRunArgs:
         type: string
         required: false
-        default: ''
       appArgs:
         type: string
         required: false
-        default: ''
       testEval:
         type: string
         required: false

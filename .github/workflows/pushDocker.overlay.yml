@@ -5,7 +5,6 @@ on:
       arch:
         type: string
         required: false
-        default: ''
         description: List of image archs to build, comma separated without spaces
       buildContext:
         type: string
@@ -14,7 +13,6 @@ on:
       dockerHubUser:
         type: string
         required: false
-        default: ''
         description: If unset, the Docker Hub user will be the same as the GitHub user
       dockerHubRegistry:
         type: string
@@ -46,7 +44,6 @@ on:
       versionTagPrefix:
         type: string
         required: false
-        default: ''
         description: Will be appended to the automatically generated version tag (only if addVersionTag is true and event is push tag)
       additionalTags:
         type: string

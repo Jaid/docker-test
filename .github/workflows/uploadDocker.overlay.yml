@@ -9,7 +9,6 @@ on:
       dockerHubUser:
         type: string
         required: false
-        default: ''
         description: If unset, the Docker Hub user will be the same as the GitHub user
       dockerHubRegistry:
         type: string
@@ -41,7 +40,6 @@ on:
       versionTagPrefix:
         type: string
         required: false
-        default: ''
         description: Will be appended to the automatically generated version tag (only if addVersionTag is true and event is push tag)
       additionalTags:
         type: string
@@ -63,11 +61,9 @@ on:
       flavorPrefix:
         type: string
         required: false
-        default: ''
       flavorSuffix:
         type: string
         required: false
-        default: ''
       flavorConnectionString:
         type: string
         required: false
