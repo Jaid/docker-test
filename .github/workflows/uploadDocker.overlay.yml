@@ -293,12 +293,12 @@ jobs:
           setOutput(tags.join('\n'))
       - name: login (${{ steps.getInputs.outputs.dockerHubUser }} @ ${{ steps.getInputs.outputs.dockerHubRegistry }})
         if: ${{ steps.getDockerHubTokenLength.outputs.length > 0 }}
-        uses: docker/login-action@v2.1.0
+        uses: docker/login-action@v2.2.0
         with:
           username: ${{ steps.getInputs.outputs.dockerHubUser }}
           password: ${{ secrets.dockerHubToken }}
       - name: login (${{ github.actor }} @ ${{ steps.getInputs.outputs.githubRegistry }})
-        uses: docker/login-action@v2.1.0
+        uses: docker/login-action@v2.2.0
         with:
           registry: ${{ steps.getInputs.outputs.githubRegistry }}
           username: ${{ github.actor }}
