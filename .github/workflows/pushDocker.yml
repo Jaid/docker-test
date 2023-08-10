@@ -25,6 +25,6 @@ jobs:
         const platformSegment = platformShortcuts[platform] ?? platform.replaceAll('/', '_');
         [baseSegment, platformSegment].filter(part => part?.length).join('-')
       testEval: stdout.includes(':-):)') && stdout.includes('Min [ms]')
-      versionTag: ${{ github.event.client_payload.versionTag }}
+      versionTag: ${{ github.event.client_payload.newTag }}
     secrets:
       dockerHubToken: ${{ secrets.dockerHubToken }}
