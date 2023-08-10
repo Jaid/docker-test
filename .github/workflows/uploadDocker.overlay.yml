@@ -308,7 +308,7 @@ jobs:
             maintainer=${{ github.actor }}
             org.opencontainers.image.vendor=${{ github.actor }}
             org.opencontainers.image.title=${{ steps.getInputs.outputs.title }}
-          tags: ${{ steps.getTags.outputs.tags }}
+          tags: ${{ steps.getTags.outputs.value }}
           flavor: |
             latest=${{ steps.getInputs.outputs.flavorLatest }}
             prefix=${{ steps.getInputs.outputs.flavorPrefix && format('{0}{1}', steps.getInputs.outputs.flavorPrefix, steps.getInputs.outputs.flavorConnectionString) || '' }}
