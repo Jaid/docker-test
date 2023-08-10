@@ -293,11 +293,11 @@ jobs:
         with:
           username: ${{ steps.getInputs.outputs.dockerHubUser }}
           password: ${{ secrets.dockerHubToken }}
-      - name: login (${{ github.actor }} @ ${{ steps.getInputs.outputs.githubRegistry }})
+      - name: login (${{ github.repository_owner }} @ ${{ steps.getInputs.outputs.githubRegistry }})
         uses: docker/login-action@v2.2.0
         with:
           registry: ${{ steps.getInputs.outputs.githubRegistry }}
-          username: ${{ github.actor }}
+          username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: extractDockerMetadata
         id: extractDockerMetadata
@@ -305,8 +305,8 @@ jobs:
         with:
           images: ${{ steps.getRefs.outputs.value }}
           labels: |
-            maintainer=${{ github.actor }}
-            org.opencontainers.image.vendor=${{ github.actor }}
+            maintainer=${{ github.repository_owner }}
+            org.opencontainers.image.vendor=${{ github.repository_owner }}
             org.opencontainers.image.title=${{ steps.getInputs.outputs.title }}
           tags: ${{ steps.getTags.outputs.value }}
           flavor: |
