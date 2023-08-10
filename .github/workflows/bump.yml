@@ -18,6 +18,6 @@ jobs:
     name: ${{ github.workflow }}
     permissions:
       contents: write
-    uses: jaid/workflows/.github/workflows/bump.yml@main
+    uses: ./.github/workflows/bump.overlay.yml
     with:
       bumpAmount: ${{ inputs.bumpAmount }}
