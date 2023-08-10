@@ -100,7 +100,7 @@ jobs:
         run: |
           set -o xtrace
           jq --indent 2 --color-output . <<< "$object"
-      - name: "* from '@actions/github'"
+      - name: '@actions/github context'
         shell: sh -c "node --input-type module < {0}"
         run: |-
           import core from '@actions/core'

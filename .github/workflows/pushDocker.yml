@@ -5,19 +5,8 @@ on:
       - main
   schedule:
     - cron: 45 23 * * 0 # https://crontab.guru/#45_23_*_*_0
-  workflow_call:
-    inputs:
-      versionTag:
-        type: string
-        required: false
-  release:
-    types:
-      - created
-      - published
-      - edited
-      - deleted
-      - prereleased
-      - released
+  repository_dispatch:
+    types: [bumped]
 jobs:
   debug:
     uses: ./.github/workflows/debug.overlay.yml
@@ -36,6 +25,6 @@ jobs:
         const platformSegment = platformShortcuts[platform] ?? platform.replaceAll('/', '_');
         [baseSegment, platformSegment].filter(part => part?.length).join('-')
       testEval: stdout.includes(':-):)') && stdout.includes('Min [ms]')
-      versionTag: ${{ github.event.release.tag_name }}
+      versionTag: ${{ github.event.client_payload.versionTag }}
     secrets:
       dockerHubToken: ${{ secrets.dockerHubToken }}
