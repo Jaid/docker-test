@@ -14,7 +14,7 @@ jobs:
       - name: installNodePackages
         id: installNodePackages
         working-directory: ${{ runner.workspace }}
-        run: npm |
+        run: |-
           cd ..
           npm install --no-package-lock --no-save @actions/core @actions/github yaml
       - name: prepare
