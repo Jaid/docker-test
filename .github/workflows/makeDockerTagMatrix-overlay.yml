@@ -41,9 +41,6 @@ jobs:
       - name: installNodePackages
         id: installNodePackages
         working-directory: ${{ runner.workspace }}
-        run: npm |      - name: installNodePackages
-        id: installNodePackages
-        working-directory: ${{ runner.workspace }}
         run: npm install --no-save --no-package-lock @actions/core vm2 super-regex js-yaml
       - id: makeMatrix
         name: makeMatrix
