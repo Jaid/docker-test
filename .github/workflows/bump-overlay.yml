@@ -73,8 +73,9 @@ jobs:
         with:
           node-version: current
       - name: installNodePackages
-        shell: bash
-        run: |
+        id: installNodePackages
+        working-directory: ${{ runner.workspace }}
+        run: npm |
           cd ..
           npm install --no-package-lock --no-save @actions/core
       - name: createTag

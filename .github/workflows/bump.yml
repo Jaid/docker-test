@@ -13,11 +13,11 @@ on:
           - major
 jobs:
   debug:
-    uses: ./.github/workflows/debug.overlay.yml
+    uses: ./.github/workflows/debug-overlay.yml
   job:
     name: ${{ github.workflow }}
     permissions:
       contents: write
-    uses: ./.github/workflows/bump.overlay.yml
+    uses: ./.github/workflows/bump-overlay.yml
     with:
       bumpAmount: ${{ inputs.bumpAmount }}

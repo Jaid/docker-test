@@ -1,4 +1,3 @@
-// @ts-nocheck
 import core from '@actions/core'
 import path from 'path'
 const inputs = JSON.parse(process.env.inputs)

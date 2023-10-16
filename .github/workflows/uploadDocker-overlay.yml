@@ -106,8 +106,9 @@ jobs:
         with:
           node-version: latest
       - name: installNodePackages
-        shell: bash
-        run: npm install --no-save --no-package-lock @actions/core @actions/github read-file-string lodash-es sort-keys
+        id: installNodePackages
+        working-directory: ${{ runner.workspace }}
+        run: npm npm install --no-save --no-package-lock @actions/core @actions/github read-file-string lodash-es sort-keys
       - id: getInputs
         name: getInputs
         shell: sh -c "node --input-type module < {0}"

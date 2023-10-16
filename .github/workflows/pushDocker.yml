@@ -9,10 +9,10 @@ on:
     types: [bumped]
 jobs:
   debug:
-    uses: ./.github/workflows/debug.overlay.yml
+    uses: ./.github/workflows/debug-overlay.yml
   job:
     name: ${{ github.workflow }}
-    uses: ./.github/workflows/pushDocker.overlay.yml
+    uses: ./.github/workflows/pushDocker-overlay.yml
     permissions:
       contents: read
       packages: write

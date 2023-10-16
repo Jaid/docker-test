@@ -103,10 +103,9 @@ jobs:
         with:
           node-version: latest
       - name: installNodePackages
-        shell: bash
-        run: |
-          cd
-          npm install --no-save --no-package-lock @actions/core read-file-string execa vm2 fs-extra
+        id: installNodePackages
+        working-directory: ${{ runner.workspace }}
+        run: npm install --no-save --no-package-lock @actions/core read-file-string execa vm2 fs-extra
       - id: getInputs
         name: getInputs
         shell: sh -c "node --input-type module < {0}"
