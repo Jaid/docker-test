@@ -56,9 +56,6 @@ jobs:
       - name: installNodePackages
         id: installNodePackages
         working-directory: ${{ runner.workspace }}
-        run: npm |      - name: installNodePackages
-        id: installNodePackages
-        working-directory: ${{ runner.workspace }}
         run: npm install --no-save --no-package-lock @actions/core read-file-string execa vm2 fs-extra
       - id: getInputs
         shell: sh -c "node --input-type module < {0}"
