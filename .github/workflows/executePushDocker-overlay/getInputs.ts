@@ -28,7 +28,7 @@ for (const [key, value] of Object.entries(matrixEntry)) {
   outputs[exclusiveKey] = value
 }
 if (!outputs.imageName) {
-  outputs.imageName = preventStart(context.payload.repository.name.toLowerCase(), 'docker-')
+  outputs.imageName = preventStart.default(context.payload.repository.name.toLowerCase(), 'docker-')
 }
 if (!outputs.imageUser) {
   outputs.imageUser = context.payload.repository.owner.login.toLowerCase()
