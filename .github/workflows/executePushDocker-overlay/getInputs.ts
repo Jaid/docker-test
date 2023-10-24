@@ -1,4 +1,4 @@
-import core from '@actions/core'
+import * as core from '@actions/core'
 import { context } from '@actions/github'
 import sortKeys from 'sort-keys'
 import {camelCase, omit} from 'lodash-es'

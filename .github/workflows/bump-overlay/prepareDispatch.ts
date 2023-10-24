@@ -1,4 +1,4 @@
-import core from '@actions/core'
+import * as core from '@actions/core'
 const steps = JSON.parse(process.env.steps!)
 const setOutput = (value, name = 'value') => {
   core.setOutput(name, value)

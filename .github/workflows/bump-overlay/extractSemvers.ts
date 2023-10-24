@@ -1,4 +1,4 @@
-import core from '@actions/core'
+import * as core from '@actions/core'
 const steps = JSON.parse(process.env.steps!)
 const extractSemver = (tag: string) => {
   return /(?<versionPrefix>v?)(?<version>\d+\.\d+\.\d+)/.exec(tag)?.groups

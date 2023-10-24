@@ -1,4 +1,4 @@
-import core from '@actions/core'
+import * as core from '@actions/core'
 import path from 'path'
 const inputs = JSON.parse(process.env.inputs!)
 const github = JSON.parse(process.env.github!)

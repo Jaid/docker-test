@@ -1,4 +1,4 @@
-import core from '@actions/core'
+import * as core from '@actions/core'
 import { matches, firstMatch } from 'super-regex'
 import { VM } from 'vm2'
 import yaml from 'yaml'
