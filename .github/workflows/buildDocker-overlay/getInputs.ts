@@ -1,7 +1,7 @@
 import core from '@actions/core'
 import path from 'path'
-const inputs = JSON.parse(process.env.inputs)
-const github = JSON.parse(process.env.github)
+const inputs = JSON.parse(process.env.inputs!)
+const github = JSON.parse(process.env.github!)
 const setOutput = (value, name = 'value') => {
   core.setOutput(name, value)
   core.info(`Output ${name}: ${value}`)

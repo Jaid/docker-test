@@ -55,37 +55,12 @@ jobs:
           node-version: latest
       - name: installNodePackages
         id: installNodePackages
-        working-directory: ${{ runner.workspace }}
-        run: npm install --no-save --no-package-lock @actions/core read-file-string execa vm2 fs-extra
+        uses: jaid/action-npm-install@main
       - id: getInputs
-        shell: sh -c "node --input-type module < {0}"
+        run: node --import tsx .github/workflows/testDocker-overlay/getInputs.ts
         env:
           inputs: ${{ toJSON(inputs) }}
           github: ${{ toJSON(github) }}
-        run: |
-          import core from '@actions/core'
-          const inputs = JSON.parse(process.env.inputs)
-          const github = JSON.parse(process.env.github)
-          const setOutput = (value, name = 'value') => {
-            core.setOutput(name, value)
-            core.info(`Output ${name}: ${value}`)
-          }
-          const outputs = {
-            ...inputs
-          }
-          if (!outputs.id) {
-            outputs.id = 'default'
-          }
-          if (!outputs.imageArtifact) {
-            outputs.imageArtifact = `${github.run_id}_${outputs.id}`
-          }
-          if (!outputs.imageFolder) {
-            outputs.imageFolder = `/tmp/dockerBuild/${github.run_id}_${outputs.id}`
-          }
-          for (const [key, value] of Object.entries(outputs)) {
-            setOutput(value, key)
-          }
-          setOutput(JSON.stringify(outputs))
       - name: loadArtifact
         uses: actions/download-artifact@v3.0.2
         with:
@@ -104,45 +79,7 @@ jobs:
         with:
           platforms: ${{ steps.getInputs.outputs.arch }}
       - id: runImage
-        shell: sh -c "node --input-type module < {0}"
+        name: runImage
+        run: node --import tsx .github/workflows/testDocker-overlay/runImage.ts
         env:
           inputs: ${{ steps.getInputs.outputs.value }}
-        run: |
-          import core from '@actions/core'
-          import { execa } from 'execa'
-          import { VM } from 'vm2'
-          import fs from 'fs-extra'
-          import path from 'path'
-          const inputs = JSON.parse(process.env.inputs)
-          const args = ['run', '--rm']
-          if (inputs.dockerRunArgs) {
-            args.push(...inputs.dockerRunArgs.split(' '))
-          }
-          if (inputs.arch !== 'linux/amd64') {
-            args.push('--platform', inputs.arch)
-          }
-          args.push(inputs.imageIdentifier)
-          if (inputs.appArgs) {
-            args.push(...inputs.appArgs.split(' '))
-          }
-          const executionResult = await execa('docker', args, {all: true, verbose: true})
-          const sandboxGlobals = {
-            stdout: executionResult.stdout,
-            stderr: executionResult.stderr,
-            status: executionResult.exitCode,
-            fs,
-            executionResult,
-            inputs
-          }
-          console.dir(sandboxGlobals)
-          if (inputs.testEval) {
-            console.log(`Running validation expression: ${inputs.testEval}`)
-            const vm = new VM({
-              sandbox: sandboxGlobals
-            })
-            const validation = vm.run(inputs.testEval)
-            console.log(`Validation expression returned: ${validation}`)
-            if (!validation) {
-              throw new Error('Validation expression returned ' + validation)
-            }
-          }

@@ -13,10 +13,7 @@ jobs:
           node-version: current
       - name: installNodePackages
         id: installNodePackages
-        working-directory: ${{ runner.workspace }}
-        run: |-
-          cd ..
-          npm install --no-package-lock --no-save @actions/core @actions/github yaml
+        uses: jaid/action-npm-install@main
       - name: prepare
         id: prepare
         shell: bash
@@ -101,25 +98,9 @@ jobs:
         run: |
           set -o xtrace
           jq --indent 2 --color-output . <<< "$object"
-      - name: '@actions/github context'
-        shell: sh -c "node --input-type module < {0}"
-        run: |-
-          import core from '@actions/core'
-          import * as github from '@actions/github'
-          import yaml from 'yaml'
-          const toYaml = input => yaml.stringify(input, null, {
-            schema: 'core',
-            lineWidth: 0,
-            minContentWidth: 0,
-            singleQuote: true,
-            nullStr: '~'
-          })
-          core.startGroup('all as dir')
-          console.dir(github)
-          core.endGroup()
-          core.startGroup('context as yaml')
-          console.log(toYaml(github.context))
-          core.endGroup()
+      - id: actionsGithubContext
+        name: '@actions/github context'
+        run: node --import tsx .github/workflows/debug-overlay/actionsGithubContext.ts
       - name: env
         shell: bash
         run: |

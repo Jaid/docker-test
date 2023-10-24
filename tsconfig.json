@@ -1,3 +1,6 @@
 {
-  "extends": "tsconfig-jaid-node"
+  "extends": "tsconfig-jaid-node",
+  "include": [
+    ".github/workflows/*/*.ts"
+  ]
 }
