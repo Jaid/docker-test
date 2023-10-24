@@ -39,6 +39,8 @@ jobs:
     outputs:
       value: ${{ steps.getInputs.outputs.value }}
     steps:
+      - name: checkout
+        uses: actions/checkout@v3.5.2
       - name: setupNode
         uses: actions/setup-node@v3.7.0
         with:

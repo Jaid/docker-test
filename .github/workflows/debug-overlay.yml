@@ -11,9 +11,6 @@ jobs:
         uses: actions/setup-node@v3.6.0
         with:
           node-version: current
-      - name: installNodePackages
-        id: installNodePackages
-        uses: jaid/action-npm-install@main
       - name: prepare
         id: prepare
         shell: bash
@@ -25,6 +22,9 @@ jobs:
           printf 'tempFolder=%s\n' "$(realpath "$RUNNER_TEMP")" >> $GITHUB_OUTPUT
       - name: checkout
         uses: actions/checkout@v3.5.2
+      - name: installNodePackages
+        id: installNodePackages
+        uses: jaid/action-npm-install@main
       - name: installPackages
         uses: awalsh128/cache-apt-pkgs-action@v1.3.0
         with:

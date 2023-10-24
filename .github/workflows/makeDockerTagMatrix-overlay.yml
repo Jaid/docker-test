@@ -38,6 +38,8 @@ jobs:
         uses: actions/setup-node@v3.7.0
         with:
           node-version: latest
+      - name: checkout
+        uses: actions/checkout@v3.5.2
       - name: installNodePackages
         id: installNodePackages
         uses: jaid/action-npm-install@main
