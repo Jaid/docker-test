@@ -41,16 +41,6 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v3.5.2
-      - id: checkoutScripts
-        name: checkoutScripts
-        uses: actions/checkout@v4.1.1
-        with:
-          repository: jaid/workflows
-          ref: dist
-          path: ${{ runner.temp }}/workflowsScripts
-      - id: debugthis
-        name: debugthis
-        run: ls -lah ${{ runner.temp }}/workflowsScripts
       - name: setupNode
         uses: actions/setup-node@v3.7.0
         with:
@@ -58,6 +48,12 @@ jobs:
       - name: installNodePackages
         id: installNodePackages
         uses: jaid/action-npm-install@main
+      - id: installWorkflowsScripts
+        name: installWorkflowsScripts
+        run: npm install --no-save --no-package-lock jaid/workflows#dist
+      - id: debugthis
+        name: debugthis
+        run: ls -lah node_modules && ls -lah node_modules/workflows
       - id: getInputs
         name: getInputs
         run: node --import tsx .github/workflows/executePushDocker-overlay/getInputs.ts
