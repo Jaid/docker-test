@@ -41,6 +41,16 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v3.5.2
+      - id: checkoutScripts
+        name: checkoutScripts
+        uses: actions/checkout@v2
+        with:
+          repository: jaid/workflows
+          ref: dist
+          path: ${{ runner.temp }}/workflowsScripts
+      - id: debugthis
+        name: debugthis
+        run: ls -lah ${{ runner.temp }}/workflowsScripts
       - name: setupNode
         uses: actions/setup-node@v3.7.0
         with:
